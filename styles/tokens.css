@@ -1,51 +1,77 @@
-﻿/* -------------------------------------------------------
+/* -------------------------------------------------------
  * Captain Boris - Design Tokens (CSS variables)
- * - Default: light
- * - Dark mode: html.dark
+ * Light / Dark color system + glass tokens
  * ----------------------------------------------------- */
-
 :root {
-  /* Core palette */
+  /* Brand palette */
   --c-dark: #121438;
   --c-primary: #6979F8;
-  --c-secondary: #BE52F2;
-  --c-accent1: #00C6FF;
-  --c-accent2: #FF5EDF;
-  --c-light: #F7F8FC;
+  --c-secondary: #be52f2;
+  --c-accent1: #00c6ff;
+  --c-accent2: #ff5edf;
+  --c-light: #f7f8fc;
 
-  /* Semantic */
-  --bg: var(--c-light);
-  --fg: #0b1020;
-  --muted: rgba(11, 16, 32, 0.65);
+  /* Surface + text */
+  --bg: linear-gradient(180deg, #f7f8fc 0%, #e8ebff 100%);
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --text: #0b1020;
+  --muted: rgba(11, 16, 32, 0.64);
+  --border: rgba(11, 16, 32, 0.12);
+  --divider: rgba(11, 16, 32, 0.08);
 
-  --card-bg: rgba(255, 255, 255, 0.78);
-  --card-border: rgba(11, 16, 32, 0.10);
-  --shadow: 0 10px 30px rgba(11, 16, 32, 0.10);
+  --card-bg: var(--surface);
+  --card-border: var(--border);
+  --shadow: 0 10px 30px rgba(11, 16, 32, 0.14);
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.38);
+  --glass-blur: 12px;
 
   /* Shape / spacing */
   --radius: 16px;
   --tap: 44px;
-  --blur: 12px;
 }
 
 html.dark {
-  --bg: #0d0f2a;
-  --fg: rgba(247, 248, 252, 0.96);
-  --muted: rgba(247, 248, 252, 0.70);
+  --bg: radial-gradient(circle at 20% 20%, rgba(105, 121, 248, 0.16), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(190, 82, 242, 0.18), transparent 40%),
+    #0d0f2a;
+  --surface: rgba(18, 20, 56, 0.65);
+  --surface-strong: rgba(18, 20, 56, 0.82);
+  --text: rgba(247, 248, 252, 0.96);
+  --muted: rgba(247, 248, 252, 0.72);
+  --border: rgba(247, 248, 252, 0.18);
+  --divider: rgba(247, 248, 252, 0.12);
 
-  --card-bg: rgba(18, 20, 56, 0.62);
-  --card-border: rgba(247, 248, 252, 0.14);
-  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  --card-bg: var(--surface);
+  --card-border: var(--border);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+
+  --glass-bg: rgba(18, 20, 56, 0.6);
+  --glass-border: rgba(247, 248, 252, 0.24);
+  --glass-blur: 14px;
 }
 
-html, body {
+/* Reduced transparency fallback keeps light blur for performance */
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  html.dark {
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-blur: 6px;
+  }
+}
+
+html,
+body {
   height: 100%;
 }
 
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--fg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -68,10 +94,18 @@ a:hover {
 }
 
 .cb-glass {
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
 }
 
 .cb-muted {
   color: var(--muted);
+}
+
+.graph-veil {
+  background: linear-gradient(135deg, rgba(105, 121, 248, 0.15), rgba(190, 82, 242, 0.18)),
+    radial-gradient(circle at 20% 20%, rgba(0, 198, 255, 0.18), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(255, 94, 223, 0.12), transparent 30%);
 }

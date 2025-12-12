@@ -1,34 +1,59 @@
-﻿import type { ReactNode } from "react";
+"use client";
+
+import { useId, useState, type ReactNode } from "react";
+import { ChevronDownIcon } from "./icons/ChevronDownIcon";
 
 type Props = {
   title: string;
+  subtitle?: string;
   defaultOpen?: boolean;
   children: ReactNode;
-  subtitle?: string;
+  collapsedSummary?: ReactNode;
 };
 
-export function CollapsibleSection({ title, subtitle, defaultOpen = false, children }: Props) {
-  return (
-    <details open={defaultOpen} style={{ marginTop: 12 }}>
-      <summary
-        style={{
-          listStyle: "none",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          gap: 12,
-          padding: "10px 12px",
-          borderRadius: "var(--radius)",
-          border: "1px solid var(--card-border)",
-          background: "var(--card-bg)",
-        }}
-      >
-        <span style={{ fontWeight: 700 }}>{title}</span>
-        {subtitle ? <span className="cb-muted" style={{ fontSize: 12 }}>{subtitle}</span> : null}
-      </summary>
+export function CollapsibleSection({
+  title,
+  subtitle,
+  defaultOpen = false,
+  collapsedSummary,
+  children,
+}: Props) {
+  const [open, setOpen] = useState(defaultOpen);
+  const panelId = useId();
 
-      <div style={{ padding: "12px 2px 2px" }}>{children}</div>
-    </details>
+  return (
+    <section className="collapsible" aria-live="polite">
+      <button
+        type="button"
+        className="collapsible__header"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <div className="collapsible__title">
+          <span style={{ fontWeight: 700 }}>{title}</span>
+          {subtitle ? <span className="collapsible__summary">{subtitle}</span> : null}
+          {!open && collapsedSummary ? (
+            <span className="pill" aria-hidden>
+              {collapsedSummary}
+            </span>
+          ) : null}
+        </div>
+        <ChevronDownIcon
+          className="nav-icon"
+          aria-hidden
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 160ms ease" }}
+        />
+      </button>
+      <div
+        id={panelId}
+        className="collapsible__content"
+        hidden={!open}
+        role="region"
+        aria-label={`${title} content`}
+      >
+        {children}
+      </div>
+    </section>
   );
 }

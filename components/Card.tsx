@@ -1,4 +1,4 @@
-﻿import type { CSSProperties, HTMLAttributes } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
 
 export type CardProps = HTMLAttributes<HTMLDivElement> & {
   glass?: boolean;
@@ -10,10 +10,11 @@ export function Card({ glass = true, style, className, ...props }: CardProps) {
     border: "1px solid var(--card-border)",
     background: "var(--card-bg)",
     boxShadow: "var(--shadow)",
+    position: "relative",
   };
 
   const glassStyle: CSSProperties = glass
-    ? { backdropFilter: "blur(var(--blur))", WebkitBackdropFilter: "blur(var(--blur))" }
+    ? { backdropFilter: "blur(var(--glass-blur))", WebkitBackdropFilter: "blur(var(--glass-blur))", background: "var(--glass-bg)" }
     : {};
 
   const mergedClass = ["cb-card", glass ? "cb-glass" : "", className ?? ""].filter(Boolean).join(" ");
