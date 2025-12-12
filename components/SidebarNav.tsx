@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactElement, RefObject } from "react";
 import { DumbbellIcon } from "./icons/DumbbellIcon";
 import { HomeIcon } from "./icons/HomeIcon";
 import { MoonIcon } from "./icons/MoonIcon";
@@ -11,12 +12,12 @@ import { UtensilsIcon } from "./icons/UtensilsIcon";
 export type NavItem = {
   href: string;
   label: string;
-  icon: JSX.Element;
+  icon: ReactElement;
 };
 
 type Props = {
   onNavigate?: () => void;
-  initialFocusRef?: React.RefObject<HTMLAnchorElement | null>;
+  initialFocusRef?: RefObject<HTMLAnchorElement | null>;
 };
 
 const items: NavItem[] = [
