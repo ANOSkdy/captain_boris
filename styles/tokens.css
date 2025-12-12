@@ -1,0 +1,77 @@
+﻿/* -------------------------------------------------------
+ * Captain Boris - Design Tokens (CSS variables)
+ * - Default: light
+ * - Dark mode: html.dark
+ * ----------------------------------------------------- */
+
+:root {
+  /* Core palette */
+  --c-dark: #121438;
+  --c-primary: #6979F8;
+  --c-secondary: #BE52F2;
+  --c-accent1: #00C6FF;
+  --c-accent2: #FF5EDF;
+  --c-light: #F7F8FC;
+
+  /* Semantic */
+  --bg: var(--c-light);
+  --fg: #0b1020;
+  --muted: rgba(11, 16, 32, 0.65);
+
+  --card-bg: rgba(255, 255, 255, 0.78);
+  --card-border: rgba(11, 16, 32, 0.10);
+  --shadow: 0 10px 30px rgba(11, 16, 32, 0.10);
+
+  /* Shape / spacing */
+  --radius: 16px;
+  --tap: 44px;
+  --blur: 12px;
+}
+
+html.dark {
+  --bg: #0d0f2a;
+  --fg: rgba(247, 248, 252, 0.96);
+  --muted: rgba(247, 248, 252, 0.70);
+
+  --card-bg: rgba(18, 20, 56, 0.62);
+  --card-border: rgba(247, 248, 252, 0.14);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Utility-ish */
+.cb-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.cb-glass {
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+}
+
+.cb-muted {
+  color: var(--muted);
+}
