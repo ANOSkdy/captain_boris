@@ -3,6 +3,7 @@ import "server-only";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { unstable_cache } from "next/cache";
 
 import {
   AirtableRecord,
@@ -30,6 +31,17 @@ export type DaysFields = {
 
 const TABLE = getTableName("AIRTABLE_TABLE_DAYS", "Days");
 const TZ = getEnvOr("APP_TZ", "Asia/Tokyo");
+
+const SELECT_FIELDS: Array<keyof DaysFields> = [
+  "ownerKey",
+  "dayDate",
+  "dayKey",
+  "weightCount",
+  "sleepCount",
+  "mealCount",
+  "workoutCount",
+  "updatedAt",
+];
 
 function toDateOnly(dateStr: string): string {
   return dayjs.tz(dateStr, TZ).format("YYYY-MM-DD");
@@ -105,6 +117,31 @@ export async function listDaysByDateRange(input: {
     filterByFormula,
     sort: [{ field: "dayDate", direction: "asc" }],
     pageSize: 100,
+    fields: SELECT_FIELDS,
     tags: tagsForMonth(input.ownerKey, month),
   });
+}
+
+export function listDaysForMonthCached(input: { ownerKey: string; month: string }) {
+  const { ownerKey, month } = input;
+  const normalizedMonth = dayjs.tz(`${month}-01`, TZ).format("YYYY-MM");
+  const start = dayjs.tz(`${normalizedMonth}-01`, TZ).startOf("month");
+  const end = start.add(1, "month");
+
+  const cacheKey = ["days-range", ownerKey, start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")];
+  const tags = tagsForMonth(ownerKey, normalizedMonth);
+
+  return unstable_cache(
+    () =>
+      listDaysByDateRange({
+        ownerKey,
+        startInclusive: start.format("YYYY-MM-DD"),
+        endExclusive: end.format("YYYY-MM-DD"),
+      }),
+    cacheKey,
+    {
+      tags,
+      revalidate: 300,
+    }
+  )();
 }

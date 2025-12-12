@@ -83,29 +83,62 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function parseRetryAfterMs(h: string | null): number | null {
+  if (!h) return null;
+  const asNumber = Number(h);
+  if (!Number.isNaN(asNumber) && asNumber >= 0) return Math.round(asNumber * 1000);
+  const asDate = Date.parse(h);
+  if (!Number.isNaN(asDate)) {
+    const diff = asDate - Date.now();
+    return diff > 0 ? diff : 0;
+  }
+  return null;
+}
+
+function backoffWithJitter(attempt: number, baseMs: number, capMs: number): number {
+  const exp = baseMs * Math.pow(2, Math.max(0, attempt - 1));
+  const capped = Math.min(capMs, exp);
+  return Math.floor(Math.random() * (capped + 1));
+}
+
 async function requestJson<T>(url: string, init: AirtableFetchInit, attempt = 0): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      ...authHeaders(),
-      ...(init.headers ?? {}),
-    },
-    cache: init.cache ?? "no-store",
-  });
+  const MAX_RETRIES = 5;
+  const BASE_DELAY_MS = 300;
+  const MAX_DELAY_MS = 6_000;
 
-  if (res.ok) {
-    return (await res.json()) as T;
+  try {
+    const res = await fetch(url, {
+      ...init,
+      headers: {
+        ...authHeaders(),
+        ...(init.headers ?? {}),
+      },
+      cache: init.cache ?? "no-store",
+    });
+
+    if (res.ok) {
+      return (await res.json()) as T;
+    }
+
+    const retryable = res.status === 429 || (res.status >= 500 && res.status <= 599);
+
+    if (retryable && attempt < MAX_RETRIES) {
+      const retryAfterMs = parseRetryAfterMs(res.headers.get("retry-after"));
+      const delay = retryAfterMs ?? backoffWithJitter(attempt + 1, BASE_DELAY_MS, MAX_DELAY_MS);
+      await sleep(delay);
+      return requestJson<T>(url, init, attempt + 1);
+    }
+
+    const text = await res.text().catch(() => "");
+    throw new Error(`Airtable request failed: ${res.status} ${res.statusText} url=${url} body=${text}`);
+  } catch (err) {
+    if (attempt < MAX_RETRIES) {
+      const delay = backoffWithJitter(attempt + 1, BASE_DELAY_MS, MAX_DELAY_MS);
+      await sleep(delay);
+      return requestJson<T>(url, init, attempt + 1);
+    }
+    throw err;
   }
-
-  const retryable = res.status === 429 || (res.status >= 500 && res.status <= 599);
-  if (retryable && attempt < 4) {
-    const backoff = 250 * Math.pow(2, attempt) + Math.floor(Math.random() * 80);
-    await sleep(backoff);
-    return requestJson<T>(url, init, attempt + 1);
-  }
-
-  const text = await res.text().catch(() => "");
-  throw new Error(`Airtable request failed: ${res.status} ${res.statusText} url=${url} body=${text}`);
 }
 
 function buildListUrl(baseId: string, table: string, opts: AirtableListOptions): string {

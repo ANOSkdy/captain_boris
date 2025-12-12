@@ -10,7 +10,7 @@ import { Card } from "@/components/Card";
 import { MonthCalendar, type MonthCalendarDayMeta } from "@/components/MonthCalendar";
 import type { AirtableRecord } from "@/lib/airtable/client";
 import type { DaysFields } from "@/lib/airtable/repositories/daysRepo";
-import { listDaysByDateRange } from "@/lib/airtable/repositories/daysRepo";
+import { listDaysForMonthCached } from "@/lib/airtable/repositories/daysRepo";
 import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 
@@ -47,7 +47,6 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
   const month = normalizeMonth(monthParam, tz);
 
   const start = dayjs.tz(`${month}-01`, tz).startOf("month");
-  const end = start.add(1, "month");
   const prevMonth = start.subtract(1, "month").format("YYYY-MM");
   const nextMonth = start.add(1, "month").format("YYYY-MM");
 
@@ -56,11 +55,7 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
 
   if (isAirtableConfigured()) {
     try {
-      days = await listDaysByDateRange({
-        ownerKey,
-        startInclusive: start.format("YYYY-MM-DD"),
-        endExclusive: end.format("YYYY-MM-DD"),
-      });
+      days = await listDaysForMonthCached({ ownerKey, month });
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -90,6 +85,16 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
         <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
           <div style={{ fontWeight: 900 }}>読み込みエラー</div>
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
+          <div style={{ marginTop: 8 }}>
+            <Link
+              href={`/home?month=${month}`}
+              prefetch={false}
+              className="cb-btn"
+              style={{ padding: "6px 10px", fontWeight: 700 }}
+            >
+              再読み込み
+            </Link>
+          </div>
         </Card>
       ) : null}
 
