@@ -109,7 +109,7 @@ export function SleepForm({ dayKey, initial, hasExisting, disabled }: Props) {
         return;
       }
 
-      setMsg(`Saved (${res.data.durationMin} min)`);
+      setMsg(`保存しました（${res.data.durationMin} 分）`);
       router.refresh();
     });
   });
@@ -122,7 +122,7 @@ export function SleepForm({ dayKey, initial, hasExisting, disabled }: Props) {
         setMsg(res.error);
         return;
       }
-      setMsg("Deleted");
+      setMsg("削除しました");
       router.refresh();
     });
   };
@@ -131,50 +131,50 @@ export function SleepForm({ dayKey, initial, hasExisting, disabled }: Props) {
     <Card glass style={{ padding: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
         <div>
-          <div style={{ fontWeight: 900 }}>Today</div>
-          <div className="cb-muted" style={{ fontSize: 12 }}>{dayKey} (wake-up day)</div>
+          <div style={{ fontWeight: 900 }}>今日の記録</div>
+          <div className="cb-muted" style={{ fontSize: 12 }}>{dayKey}（起床日）</div>
         </div>
         {msg ? <div className="cb-muted" style={{ fontSize: 12, textAlign: "right" }}>{msg}</div> : null}
       </div>
 
       <form onSubmit={onSubmit} style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Sleep start</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>就寝時刻</span>
           <input type="datetime-local" {...register("sleepStartAtLocal", { required: true })} style={inputStyle} disabled={disabled || pending} />
-          {formState.errors.sleepStartAtLocal ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>Required</span> : null}
+          {formState.errors.sleepStartAtLocal ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>必須項目です</span> : null}
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Sleep end</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>起床時刻</span>
           <input type="datetime-local" {...register("sleepEndAtLocal", { required: true })} style={inputStyle} disabled={disabled || pending} />
-          {formState.errors.sleepEndAtLocal ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>Required</span> : null}
+          {formState.errors.sleepEndAtLocal ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>必須項目です</span> : null}
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Quality (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>睡眠の質（任意）</span>
           <select {...register("quality")} style={inputStyle} disabled={disabled || pending}>
             <option value="">—</option>
-            <option value="1">1 (bad)</option>
+            <option value="1">1（悪い）</option>
             <option value="2">2</option>
-            <option value="3">3 (ok)</option>
+            <option value="3">3（ふつう）</option>
             <option value="4">4</option>
-            <option value="5">5 (great)</option>
+            <option value="5">5（とても良い）</option>
           </select>
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Note (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>メモ（任意）</span>
           <textarea {...register("note")} rows={3} style={{ ...inputStyle, minHeight: 90, resize: "vertical" }} disabled={disabled || pending} />
         </label>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
           <button type="submit" style={btnPrimary} disabled={disabled || pending}>
-            {pending ? "Saving..." : "Save"}
+            {pending ? "保存中..." : "保存"}
           </button>
 
           {hasExisting ? (
             <button type="button" style={btnGhost} onClick={onDelete} disabled={disabled || pending}>
-              {pending ? "..." : "Delete"}
+              {pending ? "..." : "削除"}
             </button>
           ) : null}
         </div>

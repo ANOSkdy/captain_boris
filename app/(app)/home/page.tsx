@@ -75,35 +75,25 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
   );
 
   return (
-    <AppShell title="Home" rightSlot={rightSlot}>
+    <AppShell title="ホーム" rightSlot={rightSlot}>
       {!isAirtableConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable not configured</div>
+          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
           <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
           <p style={{ margin: "8px 0 0" }}>
-            Set values in <code>.env.local</code> then restart dev server.
+            <code>.env.local</code> に値を設定して開発サーバーを再起動してください。
           </p>
         </Card>
       ) : null}
 
       {error ? (
         <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
-          <div style={{ fontWeight: 900 }}>Load error</div>
+          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
         </Card>
       ) : null}
 
       <MonthCalendar month={month} tz={tz} days={toMeta(days)} />
-
-      <Card glass style={{ padding: 12 }}>
-        <div style={{ fontWeight: 900, marginBottom: 8 }}>Quick links</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link href="/weight">Weight</Link>
-          <Link href="/sleep">Sleep</Link>
-          <Link href="/eat">Eat</Link>
-          <Link href="/workout">Workout</Link>
-        </div>
-      </Card>
     </AppShell>
   );
 }

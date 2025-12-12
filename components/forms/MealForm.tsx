@@ -108,14 +108,14 @@ export function MealForm({ dayKey, disabled }: Props) {
 
     const text = (getValues("text") ?? "").trim();
     if (!text) {
-      setMsg("Text is empty.");
+      setMsg("入力が空です。");
       return;
     }
 
     startAi(async () => {
       const res = await aiAssistMeal({ text });
       if (!res.ok) {
-        setMsg(`AI failed: ${res.error}`);
+        setMsg(`AIが失敗しました: ${res.error}`);
         return;
       }
 
@@ -127,7 +127,7 @@ export function MealForm({ dayKey, disabled }: Props) {
       setItemsJson(json);
       setAiAssisted(true);
 
-      setMsg("AI structured ✅");
+      setMsg("AIが整理しました ✅");
     });
   };
 
@@ -154,7 +154,7 @@ export function MealForm({ dayKey, disabled }: Props) {
         return;
       }
 
-      setMsg("Added ✅");
+      setMsg("追加しました ✅");
       setItemsJson(null);
       setAiAssisted(false);
       reset({ ...defaults, eatenAtLocal: toLocalInputValue(new Date().toISOString()) });
@@ -168,7 +168,7 @@ export function MealForm({ dayKey, disabled }: Props) {
     <Card glass style={{ padding: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
         <div>
-          <div style={{ fontWeight: 900 }}>Add meal</div>
+          <div style={{ fontWeight: 900 }}>食事を追加</div>
           <div className="cb-muted" style={{ fontSize: 12 }}>{dayKey}</div>
         </div>
         {msg ? <div className="cb-muted" style={{ fontSize: 12, textAlign: "right" }}>{msg}</div> : null}
@@ -176,23 +176,23 @@ export function MealForm({ dayKey, disabled }: Props) {
 
       <form onSubmit={onSubmit} style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Time</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>時間</span>
           <input type="datetime-local" {...register("eatenAtLocal")} style={inputStyle} disabled={disabled || savePending} />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Type</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>種類</span>
           <select {...register("mealType")} style={inputStyle} disabled={disabled || savePending}>
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-            <option value="Snack">Snack</option>
+            <option value="Breakfast">朝食</option>
+            <option value="Lunch">昼食</option>
+            <option value="Dinner">夕食</option>
+            <option value="Snack">間食</option>
           </select>
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <span className="cb-muted" style={{ fontSize: 12 }}>What did you eat?</span>
+            <span className="cb-muted" style={{ fontSize: 12 }}>食べたもの</span>
             <button
               type="button"
               style={btnGhost}
@@ -200,7 +200,7 @@ export function MealForm({ dayKey, disabled }: Props) {
               disabled={disabled || savePending || aiPending}
               aria-label="AI assist"
             >
-              {aiPending ? "AI..." : "AI Assist"}
+              {aiPending ? "AI中..." : "AI整理"}
             </button>
           </div>
 
@@ -210,13 +210,13 @@ export function MealForm({ dayKey, disabled }: Props) {
             style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
             disabled={disabled || savePending}
           />
-          {formState.errors.text ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>Required</span> : null}
+          {formState.errors.text ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>必須項目です</span> : null}
         </label>
 
         {preview ? (
           <div style={{ marginTop: -2, padding: 10, borderRadius: "var(--radius)", border: "1px solid var(--card-border)" }}>
             <div className="cb-muted" style={{ fontSize: 12, marginBottom: 6 }}>
-              AI Preview {aiAssisted ? "(will be saved)" : ""}
+              AIプレビュー {aiAssisted ? "（保存されます）" : ""}
             </div>
             {preview.items.length ? (
               <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -225,24 +225,24 @@ export function MealForm({ dayKey, disabled }: Props) {
                 ))}
               </ul>
             ) : (
-              <div className="cb-muted" style={{ fontSize: 12 }}>No items extracted.</div>
+              <div className="cb-muted" style={{ fontSize: 12 }}>抽出された項目はありません。</div>
             )}
             {preview.notes ? <div className="cb-muted" style={{ fontSize: 12, marginTop: 6 }}>{preview.notes}</div> : null}
           </div>
         ) : null}
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Calories (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>カロリー（任意）</span>
           <input inputMode="numeric" type="number" step="1" {...register("caloriesKcal")} style={inputStyle} disabled={disabled || savePending} />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Note (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>メモ（任意）</span>
           <textarea {...register("note")} rows={2} style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled={disabled || savePending} />
         </label>
 
         <button type="submit" style={btnPrimary} disabled={disabled || savePending}>
-          {savePending ? "Adding..." : "Add"}
+          {savePending ? "追加中..." : "追加"}
         </button>
       </form>
     </Card>

@@ -21,18 +21,18 @@ type Props = {
 };
 
 const items: NavItem[] = [
-  { href: "/home", label: "Home", icon: <HomeIcon className="nav-icon" /> },
-  { href: "/weight", label: "Weight", icon: <ScaleIcon className="nav-icon" /> },
-  { href: "/sleep", label: "Sleep", icon: <MoonIcon className="nav-icon" /> },
-  { href: "/eat", label: "Eat", icon: <UtensilsIcon className="nav-icon" /> },
-  { href: "/workout", label: "Workout", icon: <DumbbellIcon className="nav-icon" /> },
+  { href: "/home", label: "ホーム", icon: <HomeIcon className="nav-icon" /> },
+  { href: "/weight", label: "体重", icon: <ScaleIcon className="nav-icon" /> },
+  { href: "/sleep", label: "睡眠", icon: <MoonIcon className="nav-icon" /> },
+  { href: "/eat", label: "食事", icon: <UtensilsIcon className="nav-icon" /> },
+  { href: "/workout", label: "ワークアウト", icon: <DumbbellIcon className="nav-icon" /> },
 ];
 
 export function SidebarNav({ onNavigate, initialFocusRef }: Props) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <nav aria-label="主要ナビゲーション" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {items.map((item, idx) => {
         const active = pathname?.startsWith(item.href);
         return (

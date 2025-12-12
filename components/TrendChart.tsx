@@ -31,7 +31,7 @@ export function TrendChart({ title, unit, height = 220, data }: Props) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="x" tickFormatter={fmtX} />
           <YAxis tickFormatter={(v) => (unit ? `${v}${unit}` : String(v))} width={42} />
-          <Tooltip formatter={(v: any) => (unit ? `${v}${unit}` : v)} labelFormatter={(l) => `Day ${l}`} />
+          <Tooltip formatter={(v: any) => (unit ? `${v}${unit}` : v)} labelFormatter={(l) => `${l}日`} />
           <Line type="monotone" dataKey="y" stroke="var(--c-primary)" strokeWidth={3} dot={false} />
         </LineChart>
       </ResponsiveContainer>
