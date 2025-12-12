@@ -16,7 +16,7 @@ export type NavItem = {
 
 type Props = {
   onNavigate?: () => void;
-  initialFocusRef?: React.RefObject<HTMLAnchorElement>;
+  initialFocusRef?: React.RefObject<HTMLAnchorElement | null>;
 };
 
 const items: NavItem[] = [
