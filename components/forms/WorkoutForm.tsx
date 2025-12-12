@@ -101,14 +101,14 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
     const text = [detail, workoutType, durationMin ? `${durationMin} min` : "", intensity].filter(Boolean).join(" / ").trim();
 
     if (!text) {
-      setMsg("Detail is empty.");
+      setMsg("詳細が入力されていません。");
       return;
     }
 
     startAi(async () => {
       const res = await aiAssistWorkout({ text });
       if (!res.ok) {
-        setMsg(`AI failed: ${res.error}`);
+        setMsg(`AIが失敗しました: ${res.error}`);
         return;
       }
 
@@ -123,7 +123,7 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
       }
 
       setAiAssisted(true);
-      setMsg("AI structured ✅");
+      setMsg("AIが整理しました ✅");
     });
   };
 
@@ -149,7 +149,7 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
         return;
       }
 
-      setMsg("Added ✅");
+      setMsg("追加しました ✅");
       setAiAssisted(false);
       reset({ ...defaults, performedAtLocal: toLocalInputValue(new Date().toISOString()) });
       router.refresh();
@@ -160,7 +160,7 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
     <Card glass style={{ padding: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
         <div>
-          <div style={{ fontWeight: 900 }}>Add workout</div>
+          <div style={{ fontWeight: 900 }}>ワークアウトを追加</div>
           <div className="cb-muted" style={{ fontSize: 12 }}>{dayKey}</div>
         </div>
         {msg ? <div className="cb-muted" style={{ fontSize: 12, textAlign: "right" }}>{msg}</div> : null}
@@ -168,23 +168,23 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
 
       <form onSubmit={onSubmit} style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Time</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>時間</span>
           <input type="datetime-local" {...register("performedAtLocal")} style={inputStyle} disabled={disabled || savePending} />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Type</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>種類</span>
           <select {...register("workoutType")} style={inputStyle} disabled={disabled || savePending}>
-            <option value="Walk">Walk</option>
-            <option value="Run">Run</option>
-            <option value="Gym">Gym</option>
-            <option value="Yoga">Yoga</option>
-            <option value="Other">Other</option>
+            <option value="Walk">ウォーキング</option>
+            <option value="Run">ランニング</option>
+            <option value="Gym">ジム</option>
+            <option value="Yoga">ヨガ</option>
+            <option value="Other">その他</option>
           </select>
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Duration (min)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>時間（分）</span>
           <input
             inputMode="numeric"
             type="number"
@@ -193,22 +193,22 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
             style={inputStyle}
             disabled={disabled || savePending}
           />
-          {formState.errors.durationMin ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>Required</span> : null}
+          {formState.errors.durationMin ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>必須項目です</span> : null}
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Intensity (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>強度（任意）</span>
           <select {...register("intensity")} style={inputStyle} disabled={disabled || savePending}>
             <option value="">—</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
+            <option value="Low">低め</option>
+            <option value="Medium">ふつう</option>
+            <option value="High">高め</option>
           </select>
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <span className="cb-muted" style={{ fontSize: 12 }}>Detail (optional)</span>
+            <span className="cb-muted" style={{ fontSize: 12 }}>詳細（任意）</span>
             <button
               type="button"
               style={btnGhost}
@@ -216,15 +216,15 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
               disabled={disabled || savePending || aiPending}
               aria-label="AI assist"
             >
-              {aiPending ? "AI..." : "AI Assist"}
+              {aiPending ? "AI中..." : "AI整理"}
             </button>
           </div>
           <textarea {...register("detail")} rows={2} style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled={disabled || savePending} />
-          {aiAssisted ? <span className="cb-muted" style={{ fontSize: 12 }}>AI assisted ✓</span> : null}
+          {aiAssisted ? <span className="cb-muted" style={{ fontSize: 12 }}>AI整理済み ✓</span> : null}
         </label>
 
         <button type="submit" style={btnPrimary} disabled={disabled || savePending}>
-          {savePending ? "Adding..." : "Add"}
+          {savePending ? "追加中..." : "追加"}
         </button>
       </form>
     </Card>

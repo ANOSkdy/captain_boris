@@ -71,23 +71,23 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       <Link href={`/weight?day=${prevDay}`}>←</Link>
-      <Link href={`/home?month=${month}`}>Home</Link>
+      <Link href={`/home?month=${month}`}>ホーム</Link>
       <Link href={`/weight?day=${nextDay}`}>→</Link>
     </div>
   );
 
   return (
-    <AppShell title="Weight" rightSlot={rightSlot}>
+    <AppShell title="体重" rightSlot={rightSlot}>
       {!isAirtableConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable not configured</div>
+          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
           <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
         </Card>
       ) : null}
 
       {error ? (
         <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
-          <div style={{ fontWeight: 900 }}>Load error</div>
+          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
         </Card>
       ) : null}
@@ -109,11 +109,11 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
       />
 
       <Card glass style={{ padding: 12 }}>
-        <TrendChart title="14-day trend" unit="" data={points} />
+        <TrendChart title="直近14日間の推移" unit="" data={points} />
       </Card>
 
       <Card glass style={{ padding: 12 }}>
-        <div style={{ fontWeight: 900, marginBottom: 8 }}>History (14 days)</div>
+        <div style={{ fontWeight: 900, marginBottom: 8 }}>14日分の履歴</div>
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
           {items.map((it) => {
             const f = it.record?.fields;
@@ -121,7 +121,7 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
               <li key={it.dayKey} style={{ padding: 12, border: "1px solid var(--card-border)", borderRadius: "var(--radius)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
                   <Link href={`/weight?day=${it.dayKey}`} style={{ fontWeight: 800 }}>{it.dayKey}</Link>
-                  <div>{f ? <span>{f.weightKg} kg</span> : <span className="cb-muted">—</span>}</div>
+                  <div>{f ? <span>{f.weightKg} kg</span> : <span className="cb-muted">データなし</span>}</div>
                 </div>
                 {f?.note ? <div className="cb-muted" style={{ fontSize: 12, marginTop: 6 }}>{f.note}</div> : null}
               </li>

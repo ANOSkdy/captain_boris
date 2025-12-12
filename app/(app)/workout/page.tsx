@@ -57,7 +57,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       <Link href={`/workout?day=${prevDay}`}>←</Link>
-      <Link href={`/home?month=${month}`}>Home</Link>
+      <Link href={`/home?month=${month}`}>ホーム</Link>
       <Link href={`/workout?day=${nextDay}`}>→</Link>
     </div>
   );
@@ -70,17 +70,17 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
   }
 
   return (
-    <AppShell title="Workout" rightSlot={rightSlot}>
+    <AppShell title="ワークアウト" rightSlot={rightSlot}>
       {!isAirtableConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable not configured</div>
+          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
           <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
         </Card>
       ) : null}
 
       {error ? (
         <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
-          <div style={{ fontWeight: 900 }}>Load error</div>
+          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
         </Card>
       ) : null}
@@ -88,7 +88,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
       <WorkoutForm dayKey={dayKey} disabled={!isAirtableConfigured() || Boolean(error)} />
 
       <Card glass style={{ padding: 12 }}>
-        <div style={{ fontWeight: 900, marginBottom: 8 }}>Workouts</div>
+        <div style={{ fontWeight: 900, marginBottom: 8 }}>ワークアウトの記録</div>
 
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
           {workouts.map((w) => {
@@ -122,7 +122,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
                       }}
                       disabled={!isAirtableConfigured() || Boolean(error)}
                     >
-                      Delete
+                      削除
                     </button>
                   </form>
                 </div>
@@ -131,7 +131,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
           })}
 
           {isAirtableConfigured() && !error && workouts.length === 0 ? (
-            <li className="cb-muted" style={{ padding: 8 }}>No workouts for this day.</li>
+            <li className="cb-muted" style={{ padding: 8 }}>この日の記録はありません。</li>
           ) : null}
         </ul>
       </Card>

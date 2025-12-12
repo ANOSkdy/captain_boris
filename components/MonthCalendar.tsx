@@ -76,7 +76,7 @@ export function MonthCalendar({ month, tz, days }: Props) {
     weeks.push(currentWeek);
   }
 
-  const dow = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dow = ["日", "月", "火", "水", "木", "金", "土"];
 
   return (
     <Card glass style={{ padding: 12 }}>
@@ -120,10 +120,10 @@ export function MonthCalendar({ month, tz, days }: Props) {
               </div>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {w > 0 ? badge(`W${w}`) : null}
-                {s > 0 ? badge(`S${s}`) : null}
-                {m > 0 ? badge(`M${m}`) : null}
-                {wo > 0 ? badge(`WO${wo}`) : null}
+                {w > 0 ? badge(`体${w}`) : null}
+                {s > 0 ? badge(`睡${s}`) : null}
+                {m > 0 ? badge(`食${m}`) : null}
+                {wo > 0 ? badge(`運${wo}`) : null}
               </div>
             </Link>
           );
@@ -131,7 +131,7 @@ export function MonthCalendar({ month, tz, days }: Props) {
       </div>
 
       <p className="cb-muted" style={{ margin: "10px 2px 0", fontSize: 12 }}>
-        Tip: Tap a day to open Eat (day detail). Use links on Home for other categories.
+        ヒント：日付をタップすると該当日の食事ページが開きます。ほかのカテゴリは左のメニューから移動してください。
       </p>
     </Card>
   );

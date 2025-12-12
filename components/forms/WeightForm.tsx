@@ -108,7 +108,7 @@ export function WeightForm({ dayKey, initial, hasExisting, disabled }: Props) {
         return;
       }
 
-      setMsg(res.data.mode === "created" ? "Saved (created)" : "Saved (updated)");
+      setMsg(res.data.mode === "created" ? "保存しました（新規）" : "保存しました（更新）");
       router.refresh();
     });
   });
@@ -121,7 +121,7 @@ export function WeightForm({ dayKey, initial, hasExisting, disabled }: Props) {
         setMsg(res.error);
         return;
       }
-      setMsg("Deleted");
+      setMsg("削除しました");
       router.refresh();
     });
   };
@@ -130,7 +130,7 @@ export function WeightForm({ dayKey, initial, hasExisting, disabled }: Props) {
     <Card glass style={{ padding: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
         <div>
-          <div style={{ fontWeight: 900 }}>Today</div>
+          <div style={{ fontWeight: 900 }}>今日の記録</div>
           <div className="cb-muted" style={{ fontSize: 12 }}>{dayKey}</div>
         </div>
         {msg ? <div className="cb-muted" style={{ fontSize: 12, textAlign: "right" }}>{msg}</div> : null}
@@ -138,12 +138,12 @@ export function WeightForm({ dayKey, initial, hasExisting, disabled }: Props) {
 
       <form onSubmit={onSubmit} style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Recorded at</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>計測日時</span>
           <input type="datetime-local" {...register("recordedAtLocal")} style={inputStyle} disabled={disabled || pending} />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Weight (kg)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>体重 (kg)</span>
           <input
             inputMode="decimal"
             step="0.1"
@@ -152,27 +152,27 @@ export function WeightForm({ dayKey, initial, hasExisting, disabled }: Props) {
             style={inputStyle}
             disabled={disabled || pending}
           />
-          {formState.errors.weightKg ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>Required</span> : null}
+          {formState.errors.weightKg ? <span style={{ fontSize: 12, color: "var(--c-secondary)" }}>必須項目です</span> : null}
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Body fat (%) (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>体脂肪率 (%) 任意</span>
           <input inputMode="decimal" step="0.1" type="number" {...register("bodyFatPct")} style={inputStyle} disabled={disabled || pending} />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>Note (optional)</span>
+          <span className="cb-muted" style={{ fontSize: 12 }}>メモ（任意）</span>
           <textarea {...register("note")} rows={3} style={{ ...inputStyle, minHeight: 90, resize: "vertical" }} disabled={disabled || pending} />
         </label>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
           <button type="submit" style={btnPrimary} disabled={disabled || pending}>
-            {pending ? "Saving..." : "Save"}
+            {pending ? "保存中..." : "保存"}
           </button>
 
           {hasExisting ? (
             <button type="button" style={btnGhost} onClick={onDelete} disabled={disabled || pending}>
-              {pending ? "..." : "Delete"}
+              {pending ? "..." : "削除"}
             </button>
           ) : null}
         </div>

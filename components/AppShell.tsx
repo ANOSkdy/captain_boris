@@ -13,7 +13,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function AppShell({ title = "Captain Boris", rightSlot, actionSlot, children }: Props) {
+export function AppShell({ title = "キャプテン・ボリス", rightSlot, actionSlot, children }: Props) {
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstNavRef = useRef<HTMLAnchorElement>(null);
@@ -63,7 +63,7 @@ export function AppShell({ title = "Captain Boris", rightSlot, actionSlot, child
           <button
             type="button"
             className="icon-button app-shell__menu-btn"
-            aria-label="Open menu"
+            aria-label="メニューを開く"
             onClick={() => setOpen((v) => !v)}
             ref={menuButtonRef}
           >
@@ -71,7 +71,7 @@ export function AppShell({ title = "Captain Boris", rightSlot, actionSlot, child
           </button>
 
           <div className="app-shell__title">
-            <small>Mobile-first health log</small>
+            <small>モバイルファーストの健康ログ</small>
             <h1>{title}</h1>
           </div>
 
@@ -85,11 +85,11 @@ export function AppShell({ title = "Captain Boris", rightSlot, actionSlot, child
       <div className="app-shell__body">
         <aside ref={drawerRef} className={`app-shell__sidebar ${open ? "is-open" : ""}`.trim()}>
           <div className="app-shell__sidebar-header">
-            <div style={{ fontWeight: 800, letterSpacing: 0.2 }}>Captain Boris</div>
+            <div style={{ fontWeight: 800, letterSpacing: 0.2 }}>キャプテン・ボリス</div>
             <button
               type="button"
               className="icon-button icon-button--ghost app-shell__menu-btn"
-              aria-label="Close menu"
+              aria-label="メニューを閉じる"
               onClick={() => {
                 setOpen(false);
                 menuButtonRef.current?.focus();
