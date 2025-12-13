@@ -20,6 +20,7 @@ export type PaginatedRows = {
   total: number;
   columns: TableColumn[];
   dateColumn: string | null;
+  identifierColumn: string | null;
 };
 
 const DATE_COLUMN_PRIORITY = [
@@ -74,6 +75,11 @@ function resolveDateColumn(columns: TableColumn[]): string | null {
   return fromPriority ?? null;
 }
 
+function resolveIdentifierColumn(columns: TableColumn[]): string | null {
+  if (hasColumn(columns, "id")) return "id";
+  return columns[0]?.column_name ?? null;
+}
+
 function hasColumn(columns: TableColumn[], name: string): boolean {
   return columns.some((c) => c.column_name === name);
 }
@@ -105,7 +111,8 @@ export async function fetchRows(
   const sql = getDb();
   const { clauses, dateColumn } = buildWhereClauses(sql, columns, options.filters);
   const whereSql = clauses.length ? sql`where ${sql.join(clauses, sql` AND `)}` : sql``;
-  const orderColumn = sql(dateColumn ?? "id");
+  const identifierColumn = resolveIdentifierColumn(columns);
+  const orderColumn = sql(dateColumn ?? identifierColumn ?? "1");
   const tableIdentifier = sql(tableName);
 
   const rows = await sql`
@@ -128,6 +135,7 @@ export async function fetchRows(
     total: Number(countResult?.[0]?.count ?? 0),
     columns,
     dateColumn,
+    identifierColumn,
   };
 }
 
@@ -137,12 +145,16 @@ export async function fetchRowDetail(
 ): Promise<{ row: Record<string, unknown> | null; columns: TableColumn[] }> {
   await assertAllowedTable(tableName);
   const columns = await getTableSchema(tableName);
+  const identifierColumn = resolveIdentifierColumn(columns);
+  if (!identifierColumn) {
+    throw new Error(`No identifier column for table ${tableName}`);
+  }
   const sql = getDb();
   const tableIdentifier = sql(tableName);
   const rows = await sql`
     select *
     from ${tableIdentifier}
-    where id = ${id}
+    where ${sql(identifierColumn)} = ${id}
     limit 1
   `;
   return { row: rows?.[0] ?? null, columns };

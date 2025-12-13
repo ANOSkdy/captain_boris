@@ -154,20 +154,29 @@ export default async function TablePage({ params, searchParams }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {rows.rows.map((row) => (
-                  <tr key={String(row.id)}>
+                {rows.rows.map((row) => {
+                  const identifierValue =
+                    (rows.identifierColumn ? row[rows.identifierColumn] : row.id) ?? row.id;
+                  const rowId = identifierValue !== undefined ? String(identifierValue) : "";
+                  return (
+                    <tr key={`${rowId}-${JSON.stringify(row)}`}>
                     {rows.columns.map((col) => (
                       <td key={col.column_name} style={{ padding: "0.5rem", borderBottom: "1px solid #f1f5f9", fontSize: "0.95rem" }}>
                         {String(row[col.column_name] ?? "")}<span style={{ color: "#cbd5e1" }}>&nbsp;</span>
                       </td>
                     ))}
                     <td style={{ padding: "0.5rem", borderBottom: "1px solid #f1f5f9" }}>
-                      <Link href={`/admin/${tableName}/${row.id}`} style={{ color: "#2563eb" }}>
-                        詳細
-                      </Link>
+                      {rowId ? (
+                        <Link href={`/admin/${tableName}/${rowId}`} style={{ color: "#2563eb" }}>
+                          詳細
+                        </Link>
+                      ) : (
+                        <span style={{ color: "#94a3b8" }}>-</span>
+                      )}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
                 {rows.rows.length === 0 ? (
                   <tr>
                     <td colSpan={rows.columns.length + 1} style={{ padding: "0.75rem", textAlign: "center", color: "#4a5568" }}>
