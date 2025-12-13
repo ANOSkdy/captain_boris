@@ -63,63 +63,72 @@ export function MonthCalendar({ month, tz, days }: Props) {
 
   return (
     <Card glass style={{ padding: 12 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-        {dow.map((d) => (
-          <div key={d} className="cb-muted" style={{ fontSize: 12, textAlign: "center" }}>
-            {d}
-          </div>
-        ))}
+      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, minmax(52px, 1fr))",
+            gap: 8,
+            minWidth: 364,
+          }}
+        >
+          {dow.map((d) => (
+            <div key={d} className="cb-muted" style={{ fontSize: 12, textAlign: "center" }}>
+              {d}
+            </div>
+          ))}
 
-        {weeks.flat().map((cell, idx) => {
-          if (!cell) {
-            return <div key={`empty-${idx}`} style={{ height: 78 }} />;
-          }
+          {weeks.flat().map((cell, idx) => {
+            if (!cell) {
+              return <div key={`empty-${idx}`} style={{ height: 86 }} />;
+            }
 
-          const dayNum = Number(cell.dayKey.slice(-2));
-          const w = cell.weightCount ?? 0;
-          const s = cell.sleepCount ?? 0;
-          const m = cell.mealCount ?? 0;
-          const wo = cell.workoutCount ?? 0;
-          const hasAny = (w + s + m + wo) > 0;
+            const dayNum = Number(cell.dayKey.slice(-2));
+            const w = cell.weightCount ?? 0;
+            const s = cell.sleepCount ?? 0;
+            const m = cell.mealCount ?? 0;
+            const wo = cell.workoutCount ?? 0;
+            const hasAny = (w + s + m + wo) > 0;
 
-          return (
-            <Link
-              key={cell.dayKey}
-              href={`/daysummary?day=${cell.dayKey}`}
-              style={{
-                height: 78,
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--card-border)",
-                padding: 8,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                position: "relative",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontWeight: 800 }}>{dayNum}</span>
-              </div>
+            return (
+              <Link
+                key={cell.dayKey}
+                href={`/daysummary?day=${cell.dayKey}`}
+                style={{
+                  height: 86,
+                  borderRadius: "var(--radius)",
+                  border: "1px solid var(--card-border)",
+                  padding: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontWeight: 800, fontSize: 16 }}>{dayNum}</span>
+                </div>
 
-              {hasAny ? (
-                <span
-                  aria-label="この日に記録があります"
-                  style={{
-                    position: "absolute",
-                    bottom: 10,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: 12,
-                    height: 12,
-                    borderRadius: "50%",
-                    background: "#8B5A2B",
-                    boxShadow: "0 0 0 4px rgba(139, 90, 43, 0.12)",
-                  }}
-                />
-              ) : null}
-            </Link>
-          );
-        })}
+                {hasAny ? (
+                  <span
+                    aria-label="この日に記録があります"
+                    style={{
+                      position: "absolute",
+                      bottom: 12,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: "#8B5A2B",
+                      boxShadow: "0 0 0 4px rgba(139, 90, 43, 0.12)",
+                    }}
+                  />
+                ) : null}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <p className="cb-muted" style={{ margin: "10px 2px 0", fontSize: 12 }}>
