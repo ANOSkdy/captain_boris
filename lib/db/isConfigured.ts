@@ -1,6 +1,12 @@
 import "server-only";
 
-const KEYS = ["POSTGRES_URL", "DATABASE_URL", "NEON_DATABASE_URL"] as const;
+const KEYS = [
+  "POSTGRES_URL",
+  "POSTGRES_URL_NON_POOLING",
+  "POSTGRES_PRISMA_URL",
+  "DATABASE_URL",
+  "NEON_DATABASE_URL",
+] as const;
 
 export function isDatabaseConfigured(): boolean {
   return KEYS.some((k) => typeof process.env[k] === "string" && process.env[k]!.length > 0);
