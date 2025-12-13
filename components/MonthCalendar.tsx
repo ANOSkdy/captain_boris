@@ -3,6 +3,8 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Link from "next/link";
 
+import type { CSSProperties } from "react";
+
 import { Card } from "./Card";
 
 dayjs.extend(utc);
@@ -20,6 +22,8 @@ type Props = {
   month: string; // YYYY-MM
   tz: string;
   days: MonthCalendarDayMeta[]; // sparse
+  style?: CSSProperties;
+  className?: string;
 };
 
 function pad2(n: number): string {
@@ -30,7 +34,7 @@ function buildDayKey(month: string, day: number): string {
   return `${month}-${pad2(day)}`;
 }
 
-export function MonthCalendar({ month, tz, days }: Props) {
+export function MonthCalendar({ month, tz, days, style, className }: Props) {
   const first = dayjs.tz(`${month}-01`, tz);
   const daysInMonth = first.daysInMonth();
   const startDow = first.day(); // 0 Sun ... 6 Sat
@@ -60,16 +64,28 @@ export function MonthCalendar({ month, tz, days }: Props) {
   }
 
   const dow = ["日", "月", "火", "水", "木", "金", "土"];
+  const cellHeight = 96;
 
   return (
-    <Card glass style={{ padding: 12 }}>
-      <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+    <Card
+      glass
+      className={className}
+      style={{
+        padding: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        height: "100%",
+        ...style,
+      }}
+    >
+      <div style={{ overflowX: "auto", paddingBottom: 6, flex: "1 1 auto", minHeight: 0 }}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(7, minmax(52px, 1fr))",
-            gap: 8,
-            minWidth: 364,
+            gridTemplateColumns: "repeat(7, minmax(46px, 1fr))",
+            gap: 6,
+            minWidth: 320,
           }}
         >
           {dow.map((d) => (
@@ -80,7 +96,7 @@ export function MonthCalendar({ month, tz, days }: Props) {
 
           {weeks.flat().map((cell, idx) => {
             if (!cell) {
-              return <div key={`empty-${idx}`} style={{ height: 86 }} />;
+              return <div key={`empty-${idx}`} style={{ height: cellHeight }} />;
             }
 
             const dayNum = Number(cell.dayKey.slice(-2));
@@ -95,10 +111,10 @@ export function MonthCalendar({ month, tz, days }: Props) {
                 key={cell.dayKey}
                 href={`/daysummary?day=${cell.dayKey}`}
                 style={{
-                  height: 86,
+                  height: cellHeight,
                   borderRadius: "var(--radius)",
                   border: "1px solid var(--card-border)",
-                  padding: 10,
+                  padding: 12,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -131,7 +147,7 @@ export function MonthCalendar({ month, tz, days }: Props) {
         </div>
       </div>
 
-      <p className="cb-muted" style={{ margin: "10px 2px 0", fontSize: 12 }}>
+      <p className="cb-muted" style={{ margin: "auto 2px 0", fontSize: 12 }}>
         ヒント：日付をタップすると該当日のサマリページが開きます。カテゴリごとの編集は左のメニューから移動してください。
       </p>
     </Card>

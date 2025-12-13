@@ -95,7 +95,12 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
         </Card>
       ) : null}
 
-      <MonthCalendar month={month} tz={tz} days={toMeta(days)} />
+      <MonthCalendar
+        month={month}
+        tz={tz}
+        days={toMeta(days)}
+        style={{ maxWidth: 540, margin: "0 auto", minHeight: "calc(100dvh - 190px)" }}
+      />
     </AppShell>
   );
 }
