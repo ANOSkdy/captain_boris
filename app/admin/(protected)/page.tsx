@@ -63,7 +63,10 @@ export default async function AdminHome() {
     return (
       <main>
         <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>データブラウザ</h1>
-        <p style={{ color: "#dc2626" }}>テーブルの取得に失敗しました。接続設定と権限をご確認ください。</p>
+        <p style={{ color: "#dc2626" }}>
+          テーブルの取得に失敗しました。接続設定と権限をご確認ください。
+        </p>
+        <p style={{ color: "#4a5568", fontSize: "0.95rem" }}>{databaseConfigHint()}</p>
       </main>
     );
   }

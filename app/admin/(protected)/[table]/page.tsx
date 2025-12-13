@@ -78,6 +78,8 @@ export default async function TablePage({ params, searchParams }: PageProps) {
     );
   }
 
+  const configHint = databaseConfigHint();
+
   try {
     const schema = await getTableSchema(tableName);
     const rows = await fetchRows(tableName, {
@@ -250,7 +252,12 @@ export default async function TablePage({ params, searchParams }: PageProps) {
             </Link>
           </p>
           <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>{tableName}</h1>
-          <p style={{ color: "#dc2626" }}>テーブルの取得に失敗しました。接続設定・権限・テーブル名を確認してください。</p>
+          <p style={{ color: "#dc2626" }}>
+            テーブルの取得に失敗しました。接続設定・権限・テーブル名を確認してください。
+          </p>
+          <p style={{ color: "#4a5568", fontSize: "0.95rem" }}>
+            確認ポイント: {configHint}
+          </p>
         </div>
       </main>
     );

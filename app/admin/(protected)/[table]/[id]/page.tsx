@@ -44,6 +44,8 @@ export default async function RowDetailPage({ params }: PageProps) {
     );
   }
 
+  const configHint = databaseConfigHint();
+
   try {
     const { row, columns } = await fetchRowDetail(params.table, params.id);
     if (!row) {
@@ -114,7 +116,12 @@ export default async function RowDetailPage({ params }: PageProps) {
             </Link>
           </p>
           <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>レコード詳細</h1>
-          <p style={{ color: "#dc2626" }}>レコードの取得に失敗しました。接続設定・権限・ID を確認してください。</p>
+          <p style={{ color: "#dc2626" }}>
+            レコードの取得に失敗しました。接続設定・権限・ID を確認してください。
+          </p>
+          <p style={{ color: "#4a5568", fontSize: "0.95rem" }}>
+            確認ポイント: {configHint}
+          </p>
         </div>
       </main>
     );
