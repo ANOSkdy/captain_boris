@@ -71,7 +71,6 @@ html {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .app-shell__header {
@@ -87,26 +86,28 @@ html {
 
 .app-shell__header-row {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .app-shell__title {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: center;
+  align-items: baseline;
+  gap: 6px;
+  text-align: left;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .app-shell__title small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .app-shell__title h1 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.2px;
 }
 
@@ -114,7 +115,8 @@ html {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .icon-button {
@@ -202,10 +204,23 @@ html {
 @media (min-width: 640px) {
   .app-shell__header-row {
     grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
   }
 
   .app-shell__title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     text-align: left;
+    white-space: normal;
+  }
+
+  .app-shell__title small {
+    font-size: 12px;
+  }
+
+  .app-shell__title h1 {
+    font-size: 18px;
   }
 
   .app-shell__body {

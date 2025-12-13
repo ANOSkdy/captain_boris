@@ -3,6 +3,8 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Link from "next/link";
 
+import type { CSSProperties } from "react";
+
 import { Card } from "./Card";
 
 dayjs.extend(utc);
@@ -20,6 +22,8 @@ type Props = {
   month: string; // YYYY-MM
   tz: string;
   days: MonthCalendarDayMeta[]; // sparse
+  style?: CSSProperties;
+  className?: string;
 };
 
 function pad2(n: number): string {
@@ -30,24 +34,7 @@ function buildDayKey(month: string, day: number): string {
   return `${month}-${pad2(day)}`;
 }
 
-function badge(text: string) {
-  return (
-    <span
-      style={{
-        fontSize: 10,
-        padding: "2px 6px",
-        borderRadius: 999,
-        border: "1px solid var(--card-border)",
-        background: "rgba(105, 121, 248, 0.10)",
-        lineHeight: 1.2,
-      }}
-    >
-      {text}
-    </span>
-  );
-}
-
-export function MonthCalendar({ month, tz, days }: Props) {
+export function MonthCalendar({ month, tz, days, style, className }: Props) {
   const first = dayjs.tz(`${month}-01`, tz);
   const daysInMonth = first.daysInMonth();
   const startDow = first.day(); // 0 Sun ... 6 Sat
@@ -77,61 +64,91 @@ export function MonthCalendar({ month, tz, days }: Props) {
   }
 
   const dow = ["日", "月", "火", "水", "木", "金", "土"];
+  const cellHeight = 96;
 
   return (
-    <Card glass style={{ padding: 12 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-        {dow.map((d) => (
-          <div key={d} className="cb-muted" style={{ fontSize: 12, textAlign: "center" }}>
-            {d}
-          </div>
-        ))}
+    <Card
+      glass
+      className={className}
+      style={{
+        padding: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        height: "100%",
+        ...style,
+      }}
+    >
+      <div style={{ overflowX: "auto", paddingBottom: 6, flex: "1 1 auto", minHeight: 0 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, minmax(46px, 1fr))",
+            gap: 6,
+            minWidth: 320,
+          }}
+        >
+          {dow.map((d) => (
+            <div key={d} className="cb-muted" style={{ fontSize: 12, textAlign: "center" }}>
+              {d}
+            </div>
+          ))}
 
-        {weeks.flat().map((cell, idx) => {
-          if (!cell) {
-            return <div key={`empty-${idx}`} style={{ height: 78 }} />;
-          }
+          {weeks.flat().map((cell, idx) => {
+            if (!cell) {
+              return <div key={`empty-${idx}`} style={{ height: cellHeight }} />;
+            }
 
-          const dayNum = Number(cell.dayKey.slice(-2));
-          const w = cell.weightCount ?? 0;
-          const s = cell.sleepCount ?? 0;
-          const m = cell.mealCount ?? 0;
-          const wo = cell.workoutCount ?? 0;
-          const hasAny = (w + s + m + wo) > 0;
+            const dayNum = Number(cell.dayKey.slice(-2));
+            const w = cell.weightCount ?? 0;
+            const s = cell.sleepCount ?? 0;
+            const m = cell.mealCount ?? 0;
+            const wo = cell.workoutCount ?? 0;
+            const hasAny = (w + s + m + wo) > 0;
 
-          return (
-            <Link
-              key={cell.dayKey}
-              href={`/eat?day=${cell.dayKey}`}
-              style={{
-                height: 78,
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--card-border)",
-                background: hasAny ? "rgba(0, 198, 255, 0.10)" : "transparent",
-                padding: 8,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontWeight: 800 }}>{dayNum}</span>
-                {hasAny ? <span className="cb-muted" style={{ fontSize: 10 }}>•</span> : null}
-              </div>
+            return (
+              <Link
+                key={cell.dayKey}
+                href={`/daysummary?day=${cell.dayKey}`}
+                style={{
+                  height: cellHeight,
+                  borderRadius: "var(--radius)",
+                  border: "1px solid var(--card-border)",
+                  padding: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontWeight: 800, fontSize: 16 }}>{dayNum}</span>
+                </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {w > 0 ? badge(`体${w}`) : null}
-                {s > 0 ? badge(`睡${s}`) : null}
-                {m > 0 ? badge(`食${m}`) : null}
-                {wo > 0 ? badge(`運${wo}`) : null}
-              </div>
-            </Link>
-          );
-        })}
+                {hasAny ? (
+                  <span
+                    aria-label="この日に記録があります"
+                    style={{
+                      position: "absolute",
+                      bottom: 12,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: "#8B5A2B",
+                      boxShadow: "0 0 0 4px rgba(139, 90, 43, 0.12)",
+                    }}
+                  />
+                ) : null}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
-      <p className="cb-muted" style={{ margin: "10px 2px 0", fontSize: 12 }}>
-        ヒント：日付をタップすると該当日の食事ページが開きます。ほかのカテゴリは左のメニューから移動してください。
+      <p className="cb-muted" style={{ margin: "auto 2px 0", fontSize: 12 }}>
+        ヒント：日付をタップすると該当日のサマリページが開きます。カテゴリごとの編集は左のメニューから移動してください。
       </p>
     </Card>
   );
