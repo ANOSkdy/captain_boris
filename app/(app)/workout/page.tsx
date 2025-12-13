@@ -9,10 +9,10 @@ import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
 import { WorkoutForm } from "@/components/forms/WorkoutForm";
 
-import type { AirtableRecord } from "@/lib/airtable/client";
-import type { WorkoutFields } from "@/lib/airtable/repositories/workoutRepo";
-import { listWorkoutsByOwnerAndDayKey } from "@/lib/airtable/repositories/workoutRepo";
-import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
+import type { DbRecord } from "@/lib/db/types";
+import type { WorkoutFields } from "@/lib/db/repositories/workoutRepo";
+import { listWorkoutsByOwnerAndDayKey } from "@/lib/db/repositories/workoutRepo";
+import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { toDayKey } from "@/lib/domain/dayKey";
 
@@ -20,6 +20,8 @@ import { deleteWorkout } from "@/app/(app)/workout/actions";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+export const dynamic = "force-dynamic";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -43,10 +45,10 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
   const nextDay = base.add(1, "day").format("YYYY-MM-DD");
   const month = base.format("YYYY-MM");
 
-  let workouts: AirtableRecord<WorkoutFields>[] = [];
+  let workouts: DbRecord<WorkoutFields>[] = [];
   let error: string | null = null;
 
-  if (isAirtableConfigured()) {
+  if (isDatabaseConfigured()) {
     try {
       workouts = await listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey });
     } catch (e: unknown) {
@@ -71,10 +73,10 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
 
   return (
     <AppShell title="ワークアウト" rightSlot={rightSlot}>
-      {!isAirtableConfigured() ? (
+      {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
-          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
+          <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
+          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{databaseConfigHint()}</p>
         </Card>
       ) : null}
 
@@ -85,7 +87,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
         </Card>
       ) : null}
 
-      <WorkoutForm dayKey={dayKey} disabled={!isAirtableConfigured() || Boolean(error)} />
+      <WorkoutForm dayKey={dayKey} disabled={!isDatabaseConfigured() || Boolean(error)} />
 
       <Card glass style={{ padding: 12 }}>
         <div style={{ fontWeight: 900, marginBottom: 8 }}>ワークアウトの記録</div>
@@ -120,7 +122,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
                         color: "var(--fg)",
                         fontWeight: 700,
                       }}
-                      disabled={!isAirtableConfigured() || Boolean(error)}
+                      disabled={!isDatabaseConfigured() || Boolean(error)}
                     >
                       削除
                     </button>
@@ -130,7 +132,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
             );
           })}
 
-          {isAirtableConfigured() && !error && workouts.length === 0 ? (
+          {isDatabaseConfigured() && !error && workouts.length === 0 ? (
             <li className="cb-muted" style={{ padding: 8 }}>この日の記録はありません。</li>
           ) : null}
         </ul>

@@ -1,4 +1,4 @@
-﻿import "server-only";
+import "server-only";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -9,10 +9,10 @@ import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
 import { MealForm } from "@/components/forms/MealForm";
 
-import type { AirtableRecord } from "@/lib/airtable/client";
-import type { MealFields } from "@/lib/airtable/repositories/mealRepo";
-import { listMealsByOwnerAndDayKey } from "@/lib/airtable/repositories/mealRepo";
-import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
+import type { DbRecord } from "@/lib/db/types";
+import type { MealFields } from "@/lib/db/repositories/mealRepo";
+import { listMealsByOwnerAndDayKey } from "@/lib/db/repositories/mealRepo";
+import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { toDayKey } from "@/lib/domain/dayKey";
 
@@ -21,9 +21,13 @@ import { deleteMeal } from "@/app/(app)/eat/actions";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = Record<string, string | string[] | undefined>;
 
-function pickParam(v: string | string[] | undefined): string | undefined {
+type PickParamValue = string | string[] | undefined;
+
+function pickParam(v: PickParamValue): string | undefined {
   if (!v) return undefined;
   return Array.isArray(v) ? v[0] : v;
 }
@@ -43,10 +47,10 @@ export default async function EatPage({ searchParams }: { searchParams?: SearchP
   const nextDay = base.add(1, "day").format("YYYY-MM-DD");
   const month = base.format("YYYY-MM");
 
-  let meals: AirtableRecord<MealFields>[] = [];
+  let meals: DbRecord<MealFields>[] = [];
   let error: string | null = null;
 
-  if (isAirtableConfigured()) {
+  if (isDatabaseConfigured()) {
     try {
       meals = await listMealsByOwnerAndDayKey({ ownerKey, dayKey });
     } catch (e: unknown) {
@@ -71,10 +75,10 @@ export default async function EatPage({ searchParams }: { searchParams?: SearchP
 
   return (
     <AppShell title="食事" rightSlot={rightSlot}>
-      {!isAirtableConfigured() ? (
+      {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
-          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
+          <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
+          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{databaseConfigHint()}</p>
         </Card>
       ) : null}
 
@@ -85,7 +89,7 @@ export default async function EatPage({ searchParams }: { searchParams?: SearchP
         </Card>
       ) : null}
 
-      <MealForm dayKey={dayKey} disabled={!isAirtableConfigured() || Boolean(error)} />
+      <MealForm dayKey={dayKey} disabled={!isDatabaseConfigured() || Boolean(error)} />
 
       <Card glass style={{ padding: 12 }}>
         <div style={{ fontWeight: 900, marginBottom: 8 }}>食事の記録</div>
@@ -120,7 +124,7 @@ export default async function EatPage({ searchParams }: { searchParams?: SearchP
                         color: "var(--fg)",
                         fontWeight: 700,
                       }}
-                      disabled={!isAirtableConfigured() || Boolean(error)}
+                      disabled={!isDatabaseConfigured() || Boolean(error)}
                     >
                       削除
                     </button>
@@ -132,7 +136,7 @@ export default async function EatPage({ searchParams }: { searchParams?: SearchP
             );
           })}
 
-          {isAirtableConfigured() && !error && meals.length === 0 ? (
+          {isDatabaseConfigured() && !error && meals.length === 0 ? (
             <li className="cb-muted" style={{ padding: 8 }}>この日の記録はありません。</li>
           ) : null}
         </ul>

@@ -8,14 +8,16 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
 import { MonthCalendar, type MonthCalendarDayMeta } from "@/components/MonthCalendar";
-import type { AirtableRecord } from "@/lib/airtable/client";
-import type { DaysFields } from "@/lib/airtable/repositories/daysRepo";
-import { listDaysByDateRange } from "@/lib/airtable/repositories/daysRepo";
-import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
+import type { DbRecord } from "@/lib/db/types";
+import type { DaysFields } from "@/lib/db/repositories/daysRepo";
+import { listDaysByDateRange } from "@/lib/db/repositories/daysRepo";
+import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+export const dynamic = "force-dynamic";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -29,7 +31,7 @@ function normalizeMonth(input: string | undefined, tz: string): string {
   return dayjs().tz(tz).format("YYYY-MM");
 }
 
-function toMeta(records: AirtableRecord<DaysFields>[]): MonthCalendarDayMeta[] {
+function toMeta(records: DbRecord<DaysFields>[]): MonthCalendarDayMeta[] {
   return records.map((r) => ({
     dayKey: r.fields.dayKey,
     weightCount: r.fields.weightCount ?? 0,
@@ -51,10 +53,10 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
   const prevMonth = start.subtract(1, "month").format("YYYY-MM");
   const nextMonth = start.add(1, "month").format("YYYY-MM");
 
-  let days: AirtableRecord<DaysFields>[] = [];
+  let days: DbRecord<DaysFields>[] = [];
   let error: string | null = null;
 
-  if (isAirtableConfigured()) {
+  if (isDatabaseConfigured()) {
     try {
       days = await listDaysByDateRange({
         ownerKey,
@@ -76,10 +78,10 @@ export default async function HomePage({ searchParams }: { searchParams?: Search
 
   return (
     <AppShell title="ホーム" rightSlot={rightSlot}>
-      {!isAirtableConfigured() ? (
+      {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
-          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
+          <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
+          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{databaseConfigHint()}</p>
           <p style={{ margin: "8px 0 0" }}>
             <code>.env.local</code> に値を設定して開発サーバーを再起動してください。
           </p>

@@ -1,4 +1,4 @@
-﻿import "server-only";
+import "server-only";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -10,18 +10,20 @@ import { Card } from "@/components/Card";
 import { TrendChart, type TrendPoint } from "@/components/TrendChart";
 import { SleepForm } from "@/components/forms/SleepForm";
 
-import type { AirtableRecord } from "@/lib/airtable/client";
-import type { SleepFields } from "@/lib/airtable/repositories/sleepRepo";
-import { findSleepByOwnerAndDayKey } from "@/lib/airtable/repositories/sleepRepo";
-import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
+import type { DbRecord } from "@/lib/db/types";
+import type { SleepFields } from "@/lib/db/repositories/sleepRepo";
+import { findSleepByOwnerAndDayKey } from "@/lib/db/repositories/sleepRepo";
+import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { toDayKey } from "@/lib/domain/dayKey";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = Record<string, string | string[] | undefined>;
-type Item = { dayKey: string; record: AirtableRecord<SleepFields> | null };
+type Item = { dayKey: string; record: DbRecord<SleepFields> | null };
 
 function pickParam(v: string | string[] | undefined): string | undefined {
   if (!v) return undefined;
@@ -55,7 +57,7 @@ export default async function SleepPage({ searchParams }: { searchParams?: Searc
   let items: Item[] = [];
   let error: string | null = null;
 
-  if (isAirtableConfigured()) {
+  if (isDatabaseConfigured()) {
     try {
       const results = await Promise.all(
         dayKeys.map(async (dk) => {
@@ -72,7 +74,7 @@ export default async function SleepPage({ searchParams }: { searchParams?: Searc
   const current = items.find((it) => it.dayKey === baseDay)?.record;
   const points: TrendPoint[] = items
     .filter((it) => typeof it.record?.fields.durationMin === "number")
-    .map((it) => ({ x: it.dayKey, y: Math.round((it.record!.fields.durationMin / 60) * 10) / 10 })); // hours (1 decimal)
+    .map((it) => ({ x: it.dayKey, y: Math.round((it.record!.fields.durationMin / 60) * 10) / 10 }));
 
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -84,10 +86,10 @@ export default async function SleepPage({ searchParams }: { searchParams?: Searc
 
   return (
     <AppShell title="睡眠" rightSlot={rightSlot}>
-      {!isAirtableConfigured() ? (
+      {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
-          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
+          <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
+          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{databaseConfigHint()}</p>
         </Card>
       ) : null}
 
@@ -111,7 +113,7 @@ export default async function SleepPage({ searchParams }: { searchParams?: Searc
               }
             : undefined
         }
-        disabled={!isAirtableConfigured() || Boolean(error)}
+        disabled={!isDatabaseConfigured() || Boolean(error)}
       />
 
       <Card glass style={{ padding: 12 }}>

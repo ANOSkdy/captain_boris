@@ -1,4 +1,4 @@
-﻿import "server-only";
+import "server-only";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -10,18 +10,20 @@ import { Card } from "@/components/Card";
 import { TrendChart, type TrendPoint } from "@/components/TrendChart";
 import { WeightForm } from "@/components/forms/WeightForm";
 
-import type { AirtableRecord } from "@/lib/airtable/client";
-import type { WeightFields } from "@/lib/airtable/repositories/weightRepo";
-import { findWeightByOwnerAndDayKey } from "@/lib/airtable/repositories/weightRepo";
-import { isAirtableConfigured, airtableConfigHint } from "@/lib/airtable/isConfigured";
+import type { DbRecord } from "@/lib/db/types";
+import type { WeightFields } from "@/lib/db/repositories/weightRepo";
+import { findWeightByOwnerAndDayKey } from "@/lib/db/repositories/weightRepo";
+import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { toDayKey } from "@/lib/domain/dayKey";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = Record<string, string | string[] | undefined>;
-type Item = { dayKey: string; record: AirtableRecord<WeightFields> | null };
+type Item = { dayKey: string; record: DbRecord<WeightFields> | null };
 
 function pickParam(v: string | string[] | undefined): string | undefined {
   if (!v) return undefined;
@@ -49,7 +51,7 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
   let items: Item[] = [];
   let error: string | null = null;
 
-  if (isAirtableConfigured()) {
+  if (isDatabaseConfigured()) {
     try {
       const results = await Promise.all(
         dayKeys.map(async (dk) => {
@@ -78,10 +80,10 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
 
   return (
     <AppShell title="体重" rightSlot={rightSlot}>
-      {!isAirtableConfigured() ? (
+      {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
-          <div style={{ fontWeight: 900 }}>Airtable が未設定です</div>
-          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{airtableConfigHint()}</p>
+          <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
+          <p className="cb-muted" style={{ margin: "8px 0 0" }}>{databaseConfigHint()}</p>
         </Card>
       ) : null}
 
@@ -105,7 +107,7 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
               }
             : undefined
         }
-        disabled={!isAirtableConfigured() || Boolean(error)}
+        disabled={!isDatabaseConfigured() || Boolean(error)}
       />
 
       <Card glass style={{ padding: 12 }}>
@@ -127,6 +129,10 @@ export default async function WeightPage({ searchParams }: { searchParams?: Sear
               </li>
             );
           })}
+
+          {isDatabaseConfigured() && !error && items.length === 0 ? (
+            <li className="cb-muted" style={{ padding: 8 }}>この日の記録はありません。</li>
+          ) : null}
         </ul>
       </Card>
     </AppShell>
