@@ -2,13 +2,13 @@
 
 import { z } from "zod";
 
-import { upsertDay } from "@/lib/airtable/repositories/daysRepo";
+import { upsertDay } from "@/lib/db/repositories/daysRepo";
 import {
   createSleep,
   deleteSleepByDayKey,
   findSleepByOwnerAndDayKey,
   updateSleepById,
-} from "@/lib/airtable/repositories/sleepRepo";
+} from "@/lib/db/repositories/sleepRepo";
 
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { ok, fail, type ActionResult, toErrorMessage } from "@/lib/actions/result";

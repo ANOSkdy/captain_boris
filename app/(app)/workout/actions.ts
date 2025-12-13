@@ -2,8 +2,8 @@
 
 import { z } from "zod";
 
-import { upsertDay } from "@/lib/airtable/repositories/daysRepo";
-import { createWorkout, deleteWorkoutById, updateWorkoutById } from "@/lib/airtable/repositories/workoutRepo";
+import { upsertDay } from "@/lib/db/repositories/daysRepo";
+import { createWorkout, deleteWorkoutById, updateWorkoutById } from "@/lib/db/repositories/workoutRepo";
 
 import { getAppTz, getOwnerKey, nowIso } from "@/lib/actions/common";
 import { ok, fail, type ActionResult, toErrorMessage } from "@/lib/actions/result";

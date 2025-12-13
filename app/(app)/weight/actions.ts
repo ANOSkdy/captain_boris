@@ -2,13 +2,13 @@
 
 import { z } from "zod";
 
-import { upsertDay } from "@/lib/airtable/repositories/daysRepo";
+import { upsertDay } from "@/lib/db/repositories/daysRepo";
 import {
   createWeight,
   deleteWeightByDayKey,
   findWeightByOwnerAndDayKey,
   updateWeightById,
-} from "@/lib/airtable/repositories/weightRepo";
+} from "@/lib/db/repositories/weightRepo";
 
 import { getAppTz, getOwnerKey, nowIso } from "@/lib/actions/common";
 import { ok, fail, type ActionResult, toErrorMessage } from "@/lib/actions/result";
