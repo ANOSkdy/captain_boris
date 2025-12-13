@@ -10,7 +10,7 @@ type GeminiGenerateContentResponse = {
 };
 
 export type GeminiOptions = {
-  model?: string; // e.g., gemini-1.5-flash
+  model?: string; // e.g., models/gemini-2.5-flash
   temperature?: number;
   maxOutputTokens?: number;
   timeoutMs?: number;
@@ -66,7 +66,7 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
  */
 export async function generateJson(prompt: string, opts: GeminiOptions = {}): Promise<unknown> {
   const apiKey = getRequiredEnv("GEMINI_API_KEY");
-  const model = opts.model ?? getEnv("GEMINI_MODEL") ?? "gemini-1.5-flash";
+  const model = opts.model ?? getEnv("GEMINI_MODEL") ?? "models/gemini-2.5-flash";
   const temperature = opts.temperature ?? 0.2;
   const maxOutputTokens = opts.maxOutputTokens ?? 512;
   const timeoutMs = opts.timeoutMs ?? 15000;
