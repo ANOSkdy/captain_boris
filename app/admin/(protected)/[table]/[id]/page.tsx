@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { fetchRowDetail } from "@/lib/admin/db";
+import { databaseConfigHint, isDatabaseConfigured } from "@/lib/db/isConfigured";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,38 @@ type PageProps = {
 };
 
 export default async function RowDetailPage({ params }: PageProps) {
+  if (!isDatabaseConfigured()) {
+    return (
+      <main style={{ display: "grid", gap: "1rem" }}>
+        <div>
+          <p style={{ fontSize: "0.9rem" }}>
+            <Link href="/admin" style={{ color: "#2563eb" }}>
+              テーブル一覧
+            </Link>{" "}/{" "}
+            <Link href={`/admin/${params.table}`} style={{ color: "#2563eb" }}>
+              {params.table}
+            </Link>
+          </p>
+          <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>レコード詳細</h1>
+          <p style={{ color: "#4a5568" }}>データベース接続が未設定です。</p>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            padding: "1rem",
+            background: "#f8fafc",
+            color: "#0f172a",
+          }}
+        >
+          <p style={{ marginBottom: "0.25rem", fontWeight: 700 }}>設定ヒント</p>
+          <p style={{ margin: 0 }}>{databaseConfigHint()}</p>
+        </div>
+      </main>
+    );
+  }
+
   try {
     const { row, columns } = await fetchRowDetail(params.table, params.id);
     if (!row) {
@@ -64,11 +97,26 @@ export default async function RowDetailPage({ params }: PageProps) {
           >
             {JSON.stringify(row, null, 2)}
           </pre>
-        </section>
-      </main>
-    );
+      </section>
+    </main>
+  );
   } catch (error) {
     console.error(error);
-    notFound();
+    return (
+      <main style={{ display: "grid", gap: "1rem" }}>
+        <div>
+          <p style={{ fontSize: "0.9rem" }}>
+            <Link href="/admin" style={{ color: "#2563eb" }}>
+              テーブル一覧
+            </Link>{" "}/{" "}
+            <Link href={`/admin/${params.table}`} style={{ color: "#2563eb" }}>
+              {params.table}
+            </Link>
+          </p>
+          <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>レコード詳細</h1>
+          <p style={{ color: "#dc2626" }}>レコードの取得に失敗しました。接続設定・権限・ID を確認してください。</p>
+        </div>
+      </main>
+    );
   }
 }

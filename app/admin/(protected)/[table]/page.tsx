@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { fetchRows, getTableSchema } from "@/lib/admin/db";
+import { databaseConfigHint, isDatabaseConfigured } from "@/lib/db/isConfigured";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,6 +48,35 @@ export default async function TablePage({ params, searchParams }: PageProps) {
   const dayKey = readParam(searchParams, "day_key");
   const from = readParam(searchParams, "from");
   const to = readParam(searchParams, "to");
+
+  if (!isDatabaseConfigured()) {
+    return (
+      <main style={{ display: "grid", gap: "1rem" }}>
+        <div>
+          <p style={{ fontSize: "0.9rem" }}>
+            <Link href="/admin" style={{ color: "#2563eb" }}>
+              テーブル一覧に戻る
+            </Link>
+          </p>
+          <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>{tableName}</h1>
+          <p style={{ color: "#4a5568" }}>データベース接続が未設定です。</p>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            padding: "1rem",
+            background: "#f8fafc",
+            color: "#0f172a",
+          }}
+        >
+          <p style={{ marginBottom: "0.25rem", fontWeight: 700 }}>設定ヒント</p>
+          <p style={{ margin: 0 }}>{databaseConfigHint()}</p>
+        </div>
+      </main>
+    );
+  }
 
   try {
     const schema = await getTableSchema(tableName);
@@ -211,6 +241,18 @@ export default async function TablePage({ params, searchParams }: PageProps) {
     );
   } catch (error) {
     console.error(error);
-    notFound();
+    return (
+      <main style={{ display: "grid", gap: "1rem" }}>
+        <div>
+          <p style={{ fontSize: "0.9rem" }}>
+            <Link href="/admin" style={{ color: "#2563eb" }}>
+              テーブル一覧に戻る
+            </Link>
+          </p>
+          <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>{tableName}</h1>
+          <p style={{ color: "#dc2626" }}>テーブルの取得に失敗しました。接続設定・権限・テーブル名を確認してください。</p>
+        </div>
+      </main>
+    );
   }
 }
