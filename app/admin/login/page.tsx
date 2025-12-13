@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { isAdminProtectionEnabled } from "@/lib/admin/auth";
+import {
+  isAdminProtectionEnabled,
+  persistAdminToken,
+} from "@/lib/admin/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,9 +22,33 @@ function getError(searchParams?: PageProps["searchParams"]): string | null {
   return null;
 }
 
-export default function AdminLogin({ searchParams }: PageProps) {
-  const error = getError(searchParams);
+async function handleLogin(formData: FormData) {
+  "use server";
+
+  const required = process.env.ADMIN_TOKEN;
+  if (!required) {
+    redirect("/admin");
+  }
+
+  const token = formData.get("token")?.toString() ?? "";
+  if (token === required) {
+    await persistAdminToken(token);
+    redirect("/admin");
+  }
+
+  redirect("/admin/login?error=invalid");
+}
+
+export default async function AdminLogin({ searchParams }: PageProps) {
   const protectionEnabled = isAdminProtectionEnabled();
+  const cookieStore = await cookies();
+  const cookieToken = cookieStore.get("admin_token")?.value;
+
+  if (!protectionEnabled || cookieToken === process.env.ADMIN_TOKEN) {
+    redirect("/admin");
+  }
+
+  const error = getError(searchParams);
 
   return (
     <main style={{ padding: "1.5rem", maxWidth: 520 }}>
@@ -30,7 +59,7 @@ export default function AdminLogin({ searchParams }: PageProps) {
           : "ADMIN_TOKEN が未設定のため、ローカル確認用として認証なしで閲覧できます。"}
       </p>
 
-      <form method="POST" action="/admin/login" style={{ display: "grid", gap: "0.75rem" }}>
+      <form action={handleLogin} style={{ display: "grid", gap: "0.75rem" }}>
         <label style={{ display: "grid", gap: "0.25rem" }}>
           <span style={{ fontSize: "0.9rem", color: "#4a5568" }}>ADMIN_TOKEN</span>
           <input
