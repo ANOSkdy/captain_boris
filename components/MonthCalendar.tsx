@@ -30,23 +30,6 @@ function buildDayKey(month: string, day: number): string {
   return `${month}-${pad2(day)}`;
 }
 
-function badge(text: string) {
-  return (
-    <span
-      style={{
-        fontSize: 10,
-        padding: "2px 6px",
-        borderRadius: 999,
-        border: "1px solid var(--card-border)",
-        background: "rgba(105, 121, 248, 0.10)",
-        lineHeight: 1.2,
-      }}
-    >
-      {text}
-    </span>
-  );
-}
-
 export function MonthCalendar({ month, tz, days }: Props) {
   const first = dayjs.tz(`${month}-01`, tz);
   const daysInMonth = first.daysInMonth();
@@ -102,36 +85,45 @@ export function MonthCalendar({ month, tz, days }: Props) {
           return (
             <Link
               key={cell.dayKey}
-              href={`/eat?day=${cell.dayKey}`}
+              href={`/daysummary?day=${cell.dayKey}`}
               style={{
                 height: 78,
                 borderRadius: "var(--radius)",
                 border: "1px solid var(--card-border)",
-                background: hasAny ? "rgba(0, 198, 255, 0.10)" : "transparent",
                 padding: 8,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                position: "relative",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={{ fontWeight: 800 }}>{dayNum}</span>
-                {hasAny ? <span className="cb-muted" style={{ fontSize: 10 }}>•</span> : null}
               </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {w > 0 ? badge(`体${w}`) : null}
-                {s > 0 ? badge(`睡${s}`) : null}
-                {m > 0 ? badge(`食${m}`) : null}
-                {wo > 0 ? badge(`運${wo}`) : null}
-              </div>
+              {hasAny ? (
+                <span
+                  aria-label="この日に記録があります"
+                  style={{
+                    position: "absolute",
+                    bottom: 10,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    background: "#8B5A2B",
+                    boxShadow: "0 0 0 4px rgba(139, 90, 43, 0.12)",
+                  }}
+                />
+              ) : null}
             </Link>
           );
         })}
       </div>
 
       <p className="cb-muted" style={{ margin: "10px 2px 0", fontSize: 12 }}>
-        ヒント：日付をタップすると該当日の食事ページが開きます。ほかのカテゴリは左のメニューから移動してください。
+        ヒント：日付をタップすると該当日のサマリページが開きます。カテゴリごとの編集は左のメニューから移動してください。
       </p>
     </Card>
   );
