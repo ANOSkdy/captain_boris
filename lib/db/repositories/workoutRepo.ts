@@ -82,7 +82,8 @@ export async function listWorkoutsByOwnerAndDayKey(
   const sql = getDb();
   const rows = await sql<WorkoutRow[]>`
     SELECT * FROM workout_logs WHERE owner_key=${ownerKey}
-      AND (day_key=${key} OR (performed_at >= ${startAt} AND performed_at <= ${endAt}))
+      AND performed_at >= ${startAt}
+      AND performed_at <= ${endAt}
     ORDER BY performed_at ASC;
   `;
 

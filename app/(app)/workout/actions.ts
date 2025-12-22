@@ -32,7 +32,7 @@ export async function addWorkout(
     const tz = getAppTz();
 
     const performedAt = a.performedAt ?? nowIso();
-    const dayKey = a.dayKey ?? toDayKey(performedAt, tz);
+    const dayKey = toDayKey(performedAt, tz);
 
     const parsed = workoutInputSchema.parse({
       ownerKey,
