@@ -12,9 +12,11 @@ import type { DbRecord } from "@/lib/db/types";
 import type { WeightFields } from "@/lib/db/repositories/weightRepo";
 import type { SleepFields } from "@/lib/db/repositories/sleepRepo";
 import type { MealFields } from "@/lib/db/repositories/mealRepo";
+import type { WorkoutFields } from "@/lib/db/repositories/workoutRepo";
 import { findWeightByOwnerAndDayKey } from "@/lib/db/repositories/weightRepo";
 import { findSleepByOwnerAndDayKey } from "@/lib/db/repositories/sleepRepo";
 import { listMealsByOwnerAndDayKey } from "@/lib/db/repositories/mealRepo";
+import { listWorkoutsByOwnerAndDayKey } from "@/lib/db/repositories/workoutRepo";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getAppTz, getOwnerKey } from "@/lib/actions/common";
 import { toDayKey } from "@/lib/domain/dayKey";
@@ -63,18 +65,21 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
   let weight: DbRecord<WeightFields> | null = null;
   let sleep: DbRecord<SleepFields> | null = null;
   let meals: DbRecord<MealFields>[] = [];
+  let workouts: DbRecord<WorkoutFields>[] = [];
   let error: string | null = null;
 
   if (isDatabaseConfigured()) {
     try {
-      const [w, s, m] = await Promise.all([
+      const [w, s, m, wo] = await Promise.all([
         findWeightByOwnerAndDayKey(ownerKey, dayKey),
         findSleepByOwnerAndDayKey(ownerKey, dayKey),
         listMealsByOwnerAndDayKey(ownerKey, dayKey),
+        listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey }),
       ]);
       weight = w;
       sleep = s;
       meals = m;
+      workouts = wo;
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -210,6 +215,39 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
           </>
         ) : (
           <div className="cb-muted">この日の食事記録はありません。</div>
+        )}
+      </Card>
+
+      <Card glass style={{ padding: 12, display: "grid", gap: 12 }}>
+        <div style={{ fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <span>ワークアウト</span>
+          {workouts.length ? <span className="cb-muted" style={{ fontSize: 12 }}>合計 {workouts.length} 件</span> : null}
+        </div>
+
+        {workouts.length ? (
+          <>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>
+              {workouts.map((workout) => (
+                <li
+                  key={workout.id}
+                  style={{ padding: 10, border: "1px solid var(--card-border)", borderRadius: "var(--radius)" }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+                    <div style={{ fontWeight: 800 }}>{workout.fields.workoutType}</div>
+                    <div className="cb-muted" style={{ fontSize: 12 }}>{workout.fields.durationMin} 分</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div style={{ marginTop: 4 }}>
+              <Link className="cb-muted" style={{ fontSize: 12 }} href={`/workout?day=${dayKey}`}>
+                ワークアウトページで編集する
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="cb-muted">この日のワークアウト記録はありません。</div>
         )}
       </Card>
     </AppShell>
