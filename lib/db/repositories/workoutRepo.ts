@@ -2,7 +2,8 @@ import "server-only";
 
 import { getDb } from "../client";
 import { ensureSchema, newId } from "../schema";
-import { DbRecord, normalizeOwnerDayArgs, toIsoString } from "../types";
+import { DbRecord, toIsoString } from "../types";
+import { DEFAULT_TZ, endOfDayUtcIso, startOfDayUtcIso } from "../../domain/dayKey";
 
 export type WorkoutFields = {
   ownerKey: string;
@@ -58,17 +59,31 @@ async function findWorkoutRowById(id: string): Promise<WorkoutRow | null> {
 export async function listWorkoutsByOwnerAndDayKey(input: {
   ownerKey: string;
   dayKey: string;
+  tz?: string;
 }): Promise<DbRecord<WorkoutFields>[]>;
-export async function listWorkoutsByOwnerAndDayKey(ownerKey: string, dayKey: string): Promise<DbRecord<WorkoutFields>[]>;
 export async function listWorkoutsByOwnerAndDayKey(
-  ownerKeyOrInput: string | { ownerKey: string; dayKey: string },
-  dayKey?: string
+  ownerKey: string,
+  dayKey: string,
+  tz?: string
+): Promise<DbRecord<WorkoutFields>[]>;
+export async function listWorkoutsByOwnerAndDayKey(
+  ownerKeyOrInput: string | { ownerKey: string; dayKey: string; tz?: string },
+  dayKey?: string,
+  tz?: string
 ): Promise<DbRecord<WorkoutFields>[]> {
-  const { ownerKey, dayKey: key } = normalizeOwnerDayArgs(ownerKeyOrInput as any, dayKey as any);
+  const { ownerKey, dayKey: key, tz: zone } = typeof ownerKeyOrInput === "string"
+    ? { ownerKey: ownerKeyOrInput, dayKey: dayKey ?? "", tz }
+    : ownerKeyOrInput;
+  if (!key) throw new Error("dayKey is required");
+  const rangeTz = zone ?? DEFAULT_TZ;
+  const startAt = startOfDayUtcIso(key, rangeTz);
+  const endAt = endOfDayUtcIso(key, rangeTz);
   await ensureSchema();
   const sql = getDb();
   const rows = await sql<WorkoutRow[]>`
-    SELECT * FROM workout_logs WHERE owner_key=${ownerKey} AND day_key=${key}
+    SELECT * FROM workout_logs WHERE owner_key=${ownerKey}
+      AND performed_at >= ${startAt}
+      AND performed_at <= ${endAt}
     ORDER BY performed_at ASC;
   `;
 

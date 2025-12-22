@@ -212,6 +212,7 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
           <div className="cb-muted">この日の食事記録はありません。</div>
         )}
       </Card>
+
     </AppShell>
   );
 }

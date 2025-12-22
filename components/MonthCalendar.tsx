@@ -105,6 +105,7 @@ export function MonthCalendar({ month, tz, days, style, className }: Props) {
             const m = cell.mealCount ?? 0;
             const wo = cell.workoutCount ?? 0;
             const hasAny = (w + s + m + wo) > 0;
+            const hasWorkout = wo > 0;
 
             return (
               <Link
@@ -138,6 +139,23 @@ export function MonthCalendar({ month, tz, days, style, className }: Props) {
                       borderRadius: "50%",
                       background: "#8B5A2B",
                       boxShadow: "0 0 0 4px rgba(139, 90, 43, 0.12)",
+                    }}
+                  />
+                ) : null}
+
+                {hasWorkout ? (
+                  <span
+                    aria-label="この日にワークアウト記録があります"
+                    style={{
+                      position: "absolute",
+                      bottom: 32,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: "#22C55E",
+                      boxShadow: "0 0 0 3px rgba(34, 197, 94, 0.15)",
                     }}
                   />
                 ) : null}
