@@ -74,7 +74,7 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
         findWeightByOwnerAndDayKey(ownerKey, dayKey),
         findSleepByOwnerAndDayKey(ownerKey, dayKey),
         listMealsByOwnerAndDayKey(ownerKey, dayKey),
-        listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey }),
+        listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey, tz }),
       ]);
       weight = w;
       sleep = s;

@@ -148,8 +148,9 @@ export function MonthCalendar({ month, tz, days, style, className }: Props) {
                     aria-label="この日にワークアウト記録があります"
                     style={{
                       position: "absolute",
-                      top: 10,
-                      right: 10,
+                      bottom: 32,
+                      left: "50%",
+                      transform: "translateX(-50%)",
                       width: 10,
                       height: 10,
                       borderRadius: "50%",

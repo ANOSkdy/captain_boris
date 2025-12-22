@@ -50,7 +50,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
 
   if (isDatabaseConfigured()) {
     try {
-      workouts = await listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey });
+      workouts = await listWorkoutsByOwnerAndDayKey({ ownerKey, dayKey, tz });
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : String(e);
     }
