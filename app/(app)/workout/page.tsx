@@ -43,7 +43,6 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
   const base = dayjs.tz(dayKey, tz);
   const prevDay = base.subtract(1, "day").format("YYYY-MM-DD");
   const nextDay = base.add(1, "day").format("YYYY-MM-DD");
-  const month = base.format("YYYY-MM");
 
   let workouts: DbRecord<WorkoutFields>[] = [];
   let error: string | null = null;
@@ -59,7 +58,6 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       <Link href={`/workout?day=${prevDay}`}>←</Link>
-      <Link href={`/home?month=${month}`}>ホーム</Link>
       <Link href={`/workout?day=${nextDay}`}>→</Link>
     </div>
   );

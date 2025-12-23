@@ -58,7 +58,6 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
   const base = dayjs.tz(dayKey, tz);
   const prevDay = base.subtract(1, "day").format("YYYY-MM-DD");
   const nextDay = base.add(1, "day").format("YYYY-MM-DD");
-  const month = base.format("YYYY-MM");
 
   let weight: DbRecord<WeightFields> | null = null;
   let sleep: DbRecord<SleepFields> | null = null;
@@ -85,10 +84,22 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       <Link href={`/daysummary?day=${prevDay}`}>←</Link>
-      <Link href={`/home?month=${month}`}>ホーム</Link>
       <Link href={`/daysummary?day=${nextDay}`}>→</Link>
     </div>
   );
+
+  const workoutListButtonStyle = {
+    minHeight: "var(--tap)",
+    borderRadius: "var(--radius)",
+    border: "1px solid var(--card-border)",
+    padding: "10px 14px",
+    background: "var(--surface-strong)",
+    color: "var(--fg)",
+    fontWeight: 700,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
 
   return (
     <AppShell title={`${dayKey} のサマリ`} rightSlot={rightSlot}>
@@ -108,6 +119,12 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
         </Card>
       ) : null}
+
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Link href="/workoutlist" style={workoutListButtonStyle}>
+          ワークアウト履歴
+        </Link>
+      </div>
 
       <Card glass style={{ padding: 12, display: "grid", gap: 12 }}>
         <div style={{ fontWeight: 900 }}>体重</div>

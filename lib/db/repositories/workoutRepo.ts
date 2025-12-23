@@ -90,6 +90,17 @@ export async function listWorkoutsByOwnerAndDayKey(
   return rows.map(mapWorkout);
 }
 
+export async function listWorkoutsByOwner(ownerKey: string): Promise<DbRecord<WorkoutFields>[]> {
+  await ensureSchema();
+  const sql = getDb();
+  const rows = await sql<WorkoutRow[]>`
+    SELECT * FROM workout_logs WHERE owner_key=${ownerKey}
+    ORDER BY performed_at DESC;
+  `;
+
+  return rows.map(mapWorkout);
+}
+
 export async function createWorkout(input: {
   ownerKey: string;
   dayId: string;

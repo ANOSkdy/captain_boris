@@ -71,7 +71,6 @@ export function AppShell({ title = "キャプテン・ボリス", rightSlot, act
           </button>
 
           <div className="app-shell__title">
-            <small>モバイルファーストの健康ログ</small>
             <h1>{title}</h1>
           </div>
 
