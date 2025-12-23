@@ -58,7 +58,6 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
   const base = dayjs.tz(dayKey, tz);
   const prevDay = base.subtract(1, "day").format("YYYY-MM-DD");
   const nextDay = base.add(1, "day").format("YYYY-MM-DD");
-  const month = base.format("YYYY-MM");
 
   let weight: DbRecord<WeightFields> | null = null;
   let sleep: DbRecord<SleepFields> | null = null;
@@ -85,7 +84,6 @@ export default async function DaySummaryPage({ searchParams }: { searchParams?: 
   const rightSlot = (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       <Link href={`/daysummary?day=${prevDay}`}>←</Link>
-      <Link href={`/home?month=${month}`}>ホーム</Link>
       <Link href={`/daysummary?day=${nextDay}`}>→</Link>
     </div>
   );

@@ -3,8 +3,6 @@ import "server-only";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import Link from "next/link";
-
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
 
@@ -56,14 +54,8 @@ export default async function WorkoutListPage() {
 
   const groups = groupByDay(workouts);
 
-  const rightSlot = (
-    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-      <Link href="/home">ホーム</Link>
-    </div>
-  );
-
   return (
-    <AppShell title="ワークアウト履歴" rightSlot={rightSlot}>
+    <AppShell title="ワークアウト履歴">
       {!isDatabaseConfigured() ? (
         <Card glass style={{ padding: 12 }}>
           <div style={{ fontWeight: 900 }}>Postgres が未設定です</div>
@@ -90,37 +82,29 @@ export default async function WorkoutListPage() {
       {groups.map((group) => (
         <Card key={group.dayKey} glass style={{ padding: 12, display: "grid", gap: 10 }}>
           <div style={{ fontWeight: 900 }}>{group.dayKey}</div>
-          <div
-            className="cb-muted"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "140px 90px minmax(90px, 1fr) minmax(160px, 2fr)",
-              gap: 8,
-              fontSize: 12,
-            }}
-          >
+          <div className="workout-list__header cb-muted">
             <div>日時</div>
             <div>時間（分）</div>
             <div>種類</div>
             <div>詳細</div>
           </div>
-          <div style={{ display: "grid", gap: 8 }}>
+          <div className="workout-list__rows">
             {group.items.map((record) => {
               const f = record.fields;
               return (
-                <div
-                  key={record.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "140px 90px minmax(90px, 1fr) minmax(160px, 2fr)",
-                    gap: 8,
-                    alignItems: "start",
-                  }}
-                >
-                  <div style={{ fontSize: 13 }}>{fmtDateTime(f.performedAt, tz)}</div>
-                  <div style={{ fontSize: 13 }}>{f.durationMin}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>{f.workoutType}</div>
-                  <div style={{ fontSize: 13, whiteSpace: "pre-wrap" }}>{f.detail ?? "—"}</div>
+                <div key={record.id} className="workout-list__row">
+                  <div className="workout-list__cell" data-label="日時">
+                    <span>{fmtDateTime(f.performedAt, tz)}</span>
+                  </div>
+                  <div className="workout-list__cell" data-label="時間（分）">
+                    <span>{f.durationMin}</span>
+                  </div>
+                  <div className="workout-list__cell" data-label="種類">
+                    <span style={{ fontWeight: 700 }}>{f.workoutType}</span>
+                  </div>
+                  <div className="workout-list__cell" data-label="詳細">
+                    <span style={{ whiteSpace: "pre-wrap" }}>{f.detail ?? "—"}</span>
+                  </div>
                 </div>
               );
             })}

@@ -144,6 +144,57 @@ html {
   box-shadow: none;
 }
 
+.workout-list__header {
+  display: grid;
+  grid-template-columns: 140px 90px minmax(90px, 1fr) minmax(160px, 2fr);
+  gap: 8px;
+  font-size: 12px;
+}
+
+.workout-list__rows {
+  display: grid;
+  gap: 8px;
+}
+
+.workout-list__row {
+  display: grid;
+  grid-template-columns: 140px 90px minmax(90px, 1fr) minmax(160px, 2fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.workout-list__cell {
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .workout-list__header {
+    display: none;
+  }
+
+  .workout-list__row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--card-border);
+    background: color-mix(in srgb, var(--card-bg) 85%, transparent);
+  }
+
+  .workout-list__cell {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+
+  .workout-list__cell::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 11px;
+  }
+}
+
 .app-shell__body {
   display: grid;
   grid-template-columns: 1fr;
