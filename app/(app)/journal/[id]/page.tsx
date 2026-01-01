@@ -1,7 +1,6 @@
 import "server-only";
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
@@ -23,7 +22,14 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
   const id = params.id;
 
   if (!id) {
-    notFound();
+    return (
+      <AppShell title="ジャーナル詳細">
+        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
+          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
+          <div className="cb-muted" style={{ marginTop: 6 }}>ID が指定されていません。</div>
+        </Card>
+      </AppShell>
+    );
   }
 
   let entry = null;
@@ -37,9 +43,7 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
     }
   }
 
-  if (isDatabaseConfigured() && !error && !entry) {
-    notFound();
-  }
+  const missing = isDatabaseConfigured() && !error && !entry;
 
   const rightSlot = (
     <Link href="/journal" style={{ fontWeight: 700 }}>
@@ -69,6 +73,13 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
           <div className="cb-muted" style={{ fontSize: 12, marginTop: 4 }}>
             作成: {fmtDateTime(entry.createdAt)} / 更新: {fmtDateTime(entry.updatedAt)}
           </div>
+        </Card>
+      ) : null}
+
+      {missing ? (
+        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
+          <div style={{ fontWeight: 900 }}>見つかりませんでした</div>
+          <p className="cb-muted" style={{ marginTop: 6 }}>このIDのジャーナルは存在しないか、削除された可能性があります。</p>
         </Card>
       ) : null}
 
