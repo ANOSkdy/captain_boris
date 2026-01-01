@@ -51,6 +51,32 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
     </Link>
   );
 
+  if (!id) {
+    return (
+      <AppShell title="ジャーナル詳細" rightSlot={rightSlot}>
+        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
+          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
+          <div className="cb-muted" style={{ marginTop: 6 }}>ID が指定されていません。</div>
+          <div style={{ marginTop: 12 }}>
+            <Link
+              href="/journal"
+              style={{
+                display: "inline-block",
+                padding: "10px 14px",
+                borderRadius: "var(--radius)",
+                background: "var(--c-primary)",
+                color: "white",
+                fontWeight: 800,
+              }}
+            >
+              ジャーナル一覧へ戻る
+            </Link>
+          </div>
+        </Card>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell title="ジャーナル詳細" rightSlot={rightSlot}>
       {!isDatabaseConfigured() ? (
@@ -77,9 +103,24 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
       ) : null}
 
       {missing ? (
-        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
+        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)", display: "grid", gap: 10 }}>
           <div style={{ fontWeight: 900 }}>見つかりませんでした</div>
-          <p className="cb-muted" style={{ marginTop: 6 }}>このIDのジャーナルは存在しないか、削除された可能性があります。</p>
+          <p className="cb-muted" style={{ marginTop: 0 }}>このIDのジャーナルは存在しないか、削除された可能性があります。</p>
+          <div>
+            <Link
+              href="/journal"
+              style={{
+                display: "inline-block",
+                padding: "10px 14px",
+                borderRadius: "var(--radius)",
+                background: "var(--c-primary)",
+                color: "white",
+                fontWeight: 800,
+              }}
+            >
+              一覧に戻る
+            </Link>
+          </div>
         </Card>
       ) : null}
 
