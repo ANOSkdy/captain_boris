@@ -10,6 +10,8 @@ export async function ensureSchema(): Promise<void> {
   if (initialized) return;
   const sql = getDb();
 
+  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto;`;
+
   await sql`CREATE TABLE IF NOT EXISTS days (
     id text PRIMARY KEY,
     owner_key text NOT NULL DEFAULT 'default',
@@ -74,11 +76,45 @@ export async function ensureSchema(): Promise<void> {
     created_at timestamptz NOT NULL DEFAULT now()
   );`;
 
+  await sql`CREATE TABLE IF NOT EXISTS journal_entries (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_key text NOT NULL DEFAULT 'default',
+    title text NOT NULL,
+    details text NOT NULL,
+    attach jsonb NOT NULL DEFAULT '[]'::jsonb,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT journal_entries_attach_is_array CHECK (jsonb_typeof(attach) = 'array')
+  );`;
+
+  await sql`CREATE OR REPLACE FUNCTION journal_entries_set_updated_at()
+  RETURNS trigger AS $$
+  BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;`;
+
+  await sql`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'journal_entries_set_updated_at'
+      ) THEN
+        CREATE TRIGGER journal_entries_set_updated_at
+        BEFORE UPDATE ON journal_entries
+        FOR EACH ROW EXECUTE FUNCTION journal_entries_set_updated_at();
+      END IF;
+    END;
+    $$;
+  `;
+
   await sql`CREATE INDEX IF NOT EXISTS idx_days_owner_day_key ON days(owner_key, day_key);`;
   await sql`CREATE INDEX IF NOT EXISTS idx_weight_owner_day_key ON weight_logs(owner_key, day_key);`;
   await sql`CREATE INDEX IF NOT EXISTS idx_sleep_owner_day_key ON sleep_logs(owner_key, day_key);`;
   await sql`CREATE INDEX IF NOT EXISTS idx_meal_owner_day_key ON meal_logs(owner_key, day_key);`;
   await sql`CREATE INDEX IF NOT EXISTS idx_workout_owner_day_key ON workout_logs(owner_key, day_key);`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_journal_entries_owner_updated_at ON journal_entries(owner_key, updated_at DESC);`;
 
   initialized = true;
 }

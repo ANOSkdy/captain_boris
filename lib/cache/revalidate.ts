@@ -1,7 +1,7 @@
 import "server-only";
 
 import { revalidateTag } from "next/cache";
-import { ownerTag, monthTag, dayTag } from "./tags";
+import { ownerTag, monthTag, dayTag, journalEntryTag, journalListTag } from "./tags";
 
 // Next.js 16 expects (tag, profile)
 const CACHE_PROFILE: string = "default";
@@ -28,4 +28,14 @@ export function invalidateDay(ownerKey: string, dayKeyStr: string): void {
   safeRevalidate(dayTag(ownerKey, dayKeyStr));
   safeRevalidate(monthTag(ownerKey, month));
   safeRevalidate(ownerTag(ownerKey));
+}
+
+export function invalidateJournalList(ownerKey: string): void {
+  safeRevalidate(journalListTag(ownerKey));
+  safeRevalidate(ownerTag(ownerKey));
+}
+
+export function invalidateJournalEntry(ownerKey: string, id: string): void {
+  safeRevalidate(journalEntryTag(ownerKey, id));
+  invalidateJournalList(ownerKey);
 }
