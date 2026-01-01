@@ -42,6 +42,7 @@ export async function listJournalEntries(input: {
   limit?: number;
   offset?: number;
 }): Promise<JournalEntry[]> {
+  if (!input.ownerKey) throw new Error("ownerKey is required");
   await ensureSchema();
   const sql = getDb();
   const limit = input.limit ?? 50;
@@ -59,6 +60,8 @@ export async function getJournalEntryById(input: {
   id: string;
   ownerKey: string;
 }): Promise<JournalEntry | null> {
+  if (!input.id) throw new Error("id is required");
+  if (!input.ownerKey) throw new Error("ownerKey is required");
   await ensureSchema();
   const sql = getDb();
   const rows = await sql<JournalRow[]>`
@@ -75,11 +78,13 @@ export async function createJournalEntry(input: {
   details: string;
   attach: unknown[];
 }): Promise<JournalEntry> {
+  if (!input.ownerKey) throw new Error("ownerKey is required");
   await ensureSchema();
   const sql = getDb();
+  const sanitizedAttach = normalizeAttachments(input.attach);
   const rows = await sql<JournalRow[]>`
     INSERT INTO journal_entries (owner_key, title, details, attach)
-    VALUES (${input.ownerKey}, ${input.title}, ${input.details}, ${sql.json(input.attach)})
+    VALUES (${input.ownerKey}, ${input.title}, ${input.details}, ${sql.json(sanitizedAttach)})
     RETURNING *;
   `;
   return mapJournal(rows[0]);
@@ -92,11 +97,14 @@ export async function updateJournalEntry(input: {
   details: string;
   attach: unknown[];
 }): Promise<JournalEntry> {
+  if (!input.id) throw new Error("id is required");
+  if (!input.ownerKey) throw new Error("ownerKey is required");
   await ensureSchema();
   const sql = getDb();
+  const sanitizedAttach = normalizeAttachments(input.attach);
   const rows = await sql<JournalRow[]>`
     UPDATE journal_entries
-    SET title=${input.title}, details=${input.details}, attach=${sql.json(input.attach)}
+    SET title=${input.title}, details=${input.details}, attach=${sql.json(sanitizedAttach)}
     WHERE id=${input.id} AND owner_key=${input.ownerKey}
     RETURNING *;
   `;
@@ -105,6 +113,8 @@ export async function updateJournalEntry(input: {
 }
 
 export async function deleteJournalEntry(input: { id: string; ownerKey: string }): Promise<void> {
+  if (!input.id) throw new Error("id is required");
+  if (!input.ownerKey) throw new Error("ownerKey is required");
   await ensureSchema();
   const sql = getDb();
   await sql`

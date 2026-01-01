@@ -22,6 +22,10 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
   const ownerKey = getOwnerKey();
   const id = params.id;
 
+  if (!id) {
+    notFound();
+  }
+
   let entry = null;
   let error: string | null = null;
 
