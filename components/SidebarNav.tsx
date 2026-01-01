@@ -7,6 +7,7 @@ import { DumbbellIcon } from "./icons/DumbbellIcon";
 import { HomeIcon } from "./icons/HomeIcon";
 import { MoonIcon } from "./icons/MoonIcon";
 import { ScaleIcon } from "./icons/ScaleIcon";
+import { JournalIcon } from "./icons/JournalIcon";
 import { UtensilsIcon } from "./icons/UtensilsIcon";
 
 export type NavItem = {
@@ -26,6 +27,7 @@ const items: NavItem[] = [
   { href: "/sleep", label: "睡眠", icon: <MoonIcon className="nav-icon" /> },
   { href: "/eat", label: "食事", icon: <UtensilsIcon className="nav-icon" /> },
   { href: "/workout", label: "ワークアウト", icon: <DumbbellIcon className="nav-icon" /> },
+  { href: "/journal", label: "ジャーナル", icon: <JournalIcon className="nav-icon" /> },
 ];
 
 export function SidebarNav({ onNavigate, initialFocusRef }: Props) {

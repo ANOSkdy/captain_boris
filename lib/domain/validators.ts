@@ -50,7 +50,21 @@ export const workoutInputSchema = z.object({
   aiAssisted: z.boolean().optional(),
 });
 
+const journalAttachmentSchema = z.object({
+  url: z.string().url(),
+  name: z.string().max(200).optional(),
+  mime: z.string().max(200).optional(),
+});
+
+export const journalInputSchema = z.object({
+  ownerKey: ownerKeySchema,
+  title: z.string().min(1).max(200),
+  details: z.string().min(1),
+  attach: z.array(journalAttachmentSchema),
+});
+
 export type WeightInput = z.infer<typeof weightInputSchema>;
 export type SleepInput = z.infer<typeof sleepInputSchema>;
 export type MealInput = z.infer<typeof mealInputSchema>;
 export type WorkoutInput = z.infer<typeof workoutInputSchema>;
+export type JournalInput = z.infer<typeof journalInputSchema>;
