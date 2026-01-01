@@ -52,7 +52,7 @@ function normalizeInput(formData: FormData) {
     attach,
   });
 
-  return { ownerKey, ...validated };
+  return validated;
 }
 
 export async function createJournalAction(formData: FormData): Promise<ActionResult<{ id: string }>> {
