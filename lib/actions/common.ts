@@ -1,7 +1,9 @@
 ﻿import "server-only";
 
+import { resolveOwnerKey } from "@/lib/ownerKey";
+
 export function getOwnerKey(): string {
-  return process.env.OWNER_KEY && process.env.OWNER_KEY.length > 0 ? process.env.OWNER_KEY : "default";
+  return resolveOwnerKey();
 }
 
 export function getAppTz(): string {

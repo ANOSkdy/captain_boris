@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 import { createJournalEntry, deleteJournalEntry, updateJournalEntry } from "@/lib/db/repositories/journalRepo";
-import { getOwnerKey } from "@/lib/actions/common";
 import { fail, ok, type ActionResult, toErrorMessage } from "@/lib/actions/result";
 import { journalInputSchema } from "@/lib/domain/validators";
 import { invalidateJournalEntry, invalidateJournalList } from "@/lib/cache/revalidate";
 import { normalizeAttachments } from "@/lib/journal/attachments";
+import { resolveOwnerKey } from "@/lib/ownerKey";
 
 const formSchema = z.object({
   title: z.string().min(1),
@@ -44,7 +44,7 @@ function normalizeInput(formData: FormData) {
     attach: formData.get("attach")?.toString(),
   });
 
-  const ownerKey = getOwnerKey();
+  const ownerKey = resolveOwnerKey();
   const attach = parseAttachInput(parsed.attach);
 
   const validated = journalInputSchema.parse({
@@ -96,7 +96,7 @@ export async function updateJournalAction(id: string, formData: FormData): Promi
 
 export async function deleteJournalAction(id: string): Promise<ActionResult<{ id: string }>> {
   try {
-    const ownerKey = getOwnerKey();
+    const ownerKey = resolveOwnerKey();
     await deleteJournalEntry({ id, ownerKey });
     invalidateJournalList(ownerKey);
     return ok({ id });

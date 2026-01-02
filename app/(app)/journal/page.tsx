@@ -9,7 +9,7 @@ import { PlusIcon } from "@/components/icons/PlusIcon";
 import { JournalForm } from "@/components/forms/JournalForm";
 import { getCachedJournalEntries } from "@/lib/journal/cache";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
-import { getOwnerKey } from "@/lib/actions/common";
+import { resolveOwnerKey } from "@/lib/ownerKey";
 import { deleteJournalAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ function fmtDate(iso: string): string {
 }
 
 export default async function JournalPage() {
-  const ownerKey = getOwnerKey();
+  const ownerKey = resolveOwnerKey();
 
   let entries: Awaited<ReturnType<typeof getCachedJournalEntries>> = [];
   let error: string | null = null;

@@ -8,9 +8,10 @@ import { Card } from "@/components/Card";
 import { JournalForm } from "@/components/forms/JournalForm";
 import { getCachedJournalEntry } from "@/lib/journal/cache";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
-import { getOwnerKey } from "@/lib/actions/common";
+import { resolveOwnerKey } from "@/lib/ownerKey";
 
 export const dynamic = "force-dynamic";
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function fmtDateTime(iso: string): string {
   const d = new Date(iso);
@@ -19,14 +20,14 @@ function fmtDateTime(iso: string): string {
 }
 
 export default async function JournalDetailPage({ params }: { params: { id: string } }) {
-  const ownerKey = getOwnerKey();
   const id = (params?.id ?? "").trim();
-
-  if (!id) {
+  if (!uuidPattern.test(id)) {
     notFound();
   }
 
-  let entry = null;
+  const ownerKey = resolveOwnerKey();
+
+  let entry: Awaited<ReturnType<typeof getCachedJournalEntry>> | null = null;
   let error: string | null = null;
 
   if (isDatabaseConfigured()) {
@@ -37,7 +38,9 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
     }
   }
 
-  const missing = isDatabaseConfigured() && !error && !entry;
+  if (isDatabaseConfigured() && !error && !entry) {
+    notFound();
+  }
 
   const rightSlot = (
     <Link href="/journal" style={{ fontWeight: 700 }}>
@@ -69,8 +72,6 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
           </div>
         </Card>
       ) : null}
-
-      {missing ? notFound() : null}
 
       <JournalForm
         mode="edit"
