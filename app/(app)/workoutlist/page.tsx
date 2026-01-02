@@ -18,6 +18,8 @@ dayjs.extend(timezone);
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+dayjs.tz.setDefault("Asia/Tokyo");
+
 type WorkoutGroup = {
   dayKey: string;
   items: DbRecord<WorkoutFields>[];
@@ -28,7 +30,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
 const DISPLAY_TZ = "Asia/Tokyo";
 
 function fmtDateTime(iso: string, tz: string): string {
-  return dayjs.tz(iso, tz).format("YYYY-MM-DD HH:mm [JST]");
+  return dayjs.utc(iso).tz(tz).format("YYYY-MM-DD HH:mm [JST]");
 }
 
 function groupByDay(records: DbRecord<WorkoutFields>[]): WorkoutGroup[] {
