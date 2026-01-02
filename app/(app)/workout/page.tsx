@@ -62,6 +62,19 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
     </div>
   );
 
+  const workoutListButtonStyle = {
+    minHeight: "var(--tap)",
+    borderRadius: "var(--radius)",
+    border: "1px solid var(--card-border)",
+    padding: "10px 14px",
+    background: "var(--surface-strong)",
+    color: "var(--fg)",
+    fontWeight: 700,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   async function onDeleteWorkout(formData: FormData) {
     "use server";
     const id = String(formData.get("id") ?? "");
@@ -84,6 +97,12 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
           <pre style={{ margin: "8px 0 0", whiteSpace: "pre-wrap" }}>{error}</pre>
         </Card>
       ) : null}
+
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Link href="/workoutlist" style={workoutListButtonStyle}>
+          ワークアウト履歴
+        </Link>
+      </div>
 
       <WorkoutForm dayKey={dayKey} disabled={!isDatabaseConfigured() || Boolean(error)} />
 
