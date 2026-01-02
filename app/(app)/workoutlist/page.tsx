@@ -54,10 +54,10 @@ function filterWorkouts(records: DbRecord<WorkoutFields>[], filterType: string, 
   if (!filterType && !filterMenu) return records;
 
   return records.filter((record) => {
-    const type = record.fields.workoutType?.toLowerCase() ?? "";
-    const detail = record.fields.detail?.toLowerCase() ?? "";
+    const type = normalizeFilterValue(record.fields.workoutType);
+    const detail = normalizeFilterValue(record.fields.detail);
 
-    const matchesType = filterType ? type.includes(filterType) : true;
+    const matchesType = filterType ? type === filterType : true;
     const matchesMenu = filterMenu ? detail.includes(filterMenu) : true;
 
     return matchesType && matchesMenu;
@@ -71,8 +71,10 @@ function toWorkoutTypes(records: DbRecord<WorkoutFields>[]): string[] {
 export default async function WorkoutListPage({ searchParams }: { searchParams?: SearchParams }) {
   const tz = DISPLAY_TZ;
   const ownerKey = getOwnerKey();
-  const typeFilter = normalizeFilterValue(pickParam(searchParams?.type));
-  const menuFilter = normalizeFilterValue(pickParam(searchParams?.menu));
+  const typeFilterInput = pickParam(searchParams?.type) ?? "";
+  const menuFilterInput = pickParam(searchParams?.menu) ?? "";
+  const typeFilter = normalizeFilterValue(typeFilterInput);
+  const menuFilter = normalizeFilterValue(menuFilterInput);
 
   let workouts: DbRecord<WorkoutFields>[] = [];
   let error: string | null = null;
@@ -116,7 +118,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
               <span className="cb-muted" style={{ fontSize: 12 }}>種類</span>
               <select
                 name="type"
-                defaultValue={typeFilter}
+                defaultValue={typeFilterInput}
                 style={{
                   minHeight: "var(--tap)",
                   borderRadius: "var(--radius)",
@@ -128,7 +130,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
               >
                 <option value="">すべて</option>
                 {availableTypes.map((type) => (
-                  <option key={type} value={type.toLowerCase()}>
+                  <option key={type} value={type}>
                     {type}
                   </option>
                 ))}
@@ -139,7 +141,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
               <span className="cb-muted" style={{ fontSize: 12 }}>メニュー</span>
               <input
                 name="menu"
-                defaultValue={menuFilter}
+                defaultValue={menuFilterInput}
                 placeholder="キーワードで絞り込み"
                 style={{
                   width: "100%",
