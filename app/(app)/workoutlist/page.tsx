@@ -84,7 +84,7 @@ export default async function WorkoutListPage() {
           <div style={{ fontWeight: 900 }}>{group.dayKey}</div>
           <div className="workout-list__header cb-muted">
             <div>日時</div>
-            <div>時間（分）</div>
+            <div>重さ（kg）</div>
             <div>種類</div>
             <div>詳細</div>
           </div>
@@ -96,7 +96,7 @@ export default async function WorkoutListPage() {
                   <div className="workout-list__cell" data-label="日時">
                     <span>{fmtDateTime(f.performedAt, tz)}</span>
                   </div>
-                  <div className="workout-list__cell" data-label="時間（分）">
+                  <div className="workout-list__cell" data-label="重さ（kg）">
                     <span>{f.durationMin}</span>
                   </div>
                   <div className="workout-list__cell" data-label="種類">
