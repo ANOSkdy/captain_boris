@@ -1,6 +1,7 @@
 import "server-only";
 
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
@@ -19,17 +20,10 @@ function fmtDateTime(iso: string): string {
 
 export default async function JournalDetailPage({ params }: { params: { id: string } }) {
   const ownerKey = getOwnerKey();
-  const id = params.id;
+  const id = (params?.id ?? "").trim();
 
   if (!id) {
-    return (
-      <AppShell title="ジャーナル詳細">
-        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
-          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
-          <div className="cb-muted" style={{ marginTop: 6 }}>ID が指定されていません。</div>
-        </Card>
-      </AppShell>
-    );
+    notFound();
   }
 
   let entry = null;
@@ -43,7 +37,9 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
     }
   }
 
-  const missing = isDatabaseConfigured() && !error && !entry;
+  if (isDatabaseConfigured() && !error && !entry) {
+    notFound();
+  }
 
   const rightSlot = (
     <Link href="/journal" style={{ fontWeight: 700 }}>
@@ -98,28 +94,6 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
           <div style={{ fontWeight: 900 }}>{entry.title}</div>
           <div className="cb-muted" style={{ fontSize: 12, marginTop: 4 }}>
             作成: {fmtDateTime(entry.createdAt)} / 更新: {fmtDateTime(entry.updatedAt)}
-          </div>
-        </Card>
-      ) : null}
-
-      {missing ? (
-        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)", display: "grid", gap: 10 }}>
-          <div style={{ fontWeight: 900 }}>見つかりませんでした</div>
-          <p className="cb-muted" style={{ marginTop: 0 }}>このIDのジャーナルは存在しないか、削除された可能性があります。</p>
-          <div>
-            <Link
-              href="/journal"
-              style={{
-                display: "inline-block",
-                padding: "10px 14px",
-                borderRadius: "var(--radius)",
-                background: "var(--c-primary)",
-                color: "white",
-                fontWeight: 800,
-              }}
-            >
-              一覧に戻る
-            </Link>
           </div>
         </Card>
       ) : null}
