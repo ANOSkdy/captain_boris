@@ -1,6 +1,6 @@
 import "server-only";
 
-import { unstable_cache } from "next/cache";
+import { unstable_cache, unstable_noStore as noStore } from "next/cache";
 
 import { getJournalEntryById, listJournalEntries } from "@/lib/db/repositories/journalRepo";
 import { journalEntryTag, journalListTag } from "@/lib/cache/tags";
@@ -15,10 +15,6 @@ export async function getCachedJournalEntries(ownerKey: string) {
 }
 
 export async function getCachedJournalEntry(ownerKey: string, id: string) {
-  const cached = unstable_cache(
-    () => getJournalEntryById({ ownerKey, id }),
-    [`journal:entry:${ownerKey}:${id}`],
-    { tags: [journalEntryTag(ownerKey, id)], revalidate: false }
-  );
-  return cached();
+  noStore();
+  return getJournalEntryById({ ownerKey, id });
 }
