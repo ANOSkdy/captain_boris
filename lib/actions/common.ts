@@ -1,8 +1,8 @@
 ﻿import "server-only";
 
-export function getOwnerKey(): string {
-  return process.env.OWNER_KEY && process.env.OWNER_KEY.length > 0 ? process.env.OWNER_KEY : "default";
-}
+import { getOwnerKey as getServerOwnerKey } from "@/lib/server/ownerKey";
+
+export const getOwnerKey = getServerOwnerKey;
 
 export function getAppTz(): string {
   return process.env.APP_TZ && process.env.APP_TZ.length > 0 ? process.env.APP_TZ : "Asia/Tokyo";

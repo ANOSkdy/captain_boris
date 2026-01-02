@@ -9,7 +9,7 @@ import { PlusIcon } from "@/components/icons/PlusIcon";
 import { JournalForm } from "@/components/forms/JournalForm";
 import { getCachedJournalEntries } from "@/lib/journal/cache";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
-import { getOwnerKey } from "@/lib/actions/common";
+import { getOwnerKey } from "@/lib/server/ownerKey";
 import { deleteJournalAction } from "./actions";
 
 export const dynamic = "force-dynamic";
