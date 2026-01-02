@@ -101,6 +101,37 @@ export async function listWorkoutsByOwner(ownerKey: string): Promise<DbRecord<Wo
   return rows.map(mapWorkout);
 }
 
+export async function listWorkoutsByOwnerFiltered(input: {
+  ownerKey: string;
+  workoutType?: string;
+  menuKeyword?: string;
+}): Promise<DbRecord<WorkoutFields>[]> {
+  await ensureSchema();
+  const sql = getDb();
+
+  const clauses = [sql`owner_key=${input.ownerKey}`];
+  if (input.workoutType) clauses.push(sql`LOWER(workout_type)=LOWER(${input.workoutType})`);
+  if (input.menuKeyword) clauses.push(sql`detail ILIKE ${"%" + input.menuKeyword + "%"}`);
+
+  const rows = await sql<WorkoutRow[]>`
+    SELECT * FROM workout_logs
+    WHERE ${sql.join(clauses, sql` AND `)}
+    ORDER BY performed_at DESC;
+  `;
+
+  return rows.map(mapWorkout);
+}
+
+export async function listWorkoutTypes(ownerKey: string): Promise<string[]> {
+  await ensureSchema();
+  const sql = getDb();
+  const rows = await sql<{ workout_type: string | null }[]>`
+    SELECT DISTINCT workout_type FROM workout_logs WHERE owner_key=${ownerKey} ORDER BY workout_type ASC;
+  `;
+
+  return rows.map((r) => r.workout_type).filter((v): v is string => Boolean(v));
+}
+
 export async function createWorkout(input: {
   ownerKey: string;
   dayId: string;

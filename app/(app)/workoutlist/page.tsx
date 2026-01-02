@@ -8,7 +8,7 @@ import { Card } from "@/components/Card";
 
 import type { DbRecord } from "@/lib/db/types";
 import type { WorkoutFields } from "@/lib/db/repositories/workoutRepo";
-import { listWorkoutsByOwner } from "@/lib/db/repositories/workoutRepo";
+import { listWorkoutTypes, listWorkoutsByOwnerFiltered } from "@/lib/db/repositories/workoutRepo";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
 import { getOwnerKey } from "@/lib/actions/common";
 
@@ -51,46 +51,38 @@ function normalizeFilterValue(v: string | undefined): string {
   return v?.trim().toLowerCase() ?? "";
 }
 
-function filterWorkouts(records: DbRecord<WorkoutFields>[], filterType: string, filterMenu: string) {
-  if (!filterType && !filterMenu) return records;
-
-  return records.filter((record) => {
-    const type = normalizeFilterValue(record.fields.workoutType);
-    const detail = normalizeFilterValue(record.fields.detail);
-
-    const matchesType = filterType ? type === filterType : true;
-    const matchesMenu = filterMenu ? detail.includes(filterMenu) : true;
-
-    return matchesType && matchesMenu;
-  });
-}
-
-function toWorkoutTypes(records: DbRecord<WorkoutFields>[]): string[] {
-  return Array.from(new Set(records.map((r) => r.fields.workoutType))).filter(Boolean).sort();
-}
-
 export default async function WorkoutListPage({ searchParams }: { searchParams?: SearchParams }) {
   const tz = DISPLAY_TZ;
   const ownerKey = getOwnerKey();
   const typeFilterInput = pickParam(searchParams?.type) ?? "";
   const menuFilterInput = pickParam(searchParams?.menu) ?? "";
-  const typeFilter = normalizeFilterValue(typeFilterInput);
-  const menuFilter = normalizeFilterValue(menuFilterInput);
+  const typeFilterValue = typeFilterInput.trim();
+  const menuFilterValue = menuFilterInput.trim();
+  const typeFilter = normalizeFilterValue(typeFilterValue);
+  const menuFilter = normalizeFilterValue(menuFilterValue);
 
   let workouts: DbRecord<WorkoutFields>[] = [];
+  let availableTypes: string[] = [];
   let error: string | null = null;
 
   if (isDatabaseConfigured()) {
     try {
-      workouts = await listWorkoutsByOwner(ownerKey);
+      const [types, filtered] = await Promise.all([
+        listWorkoutTypes(ownerKey),
+        listWorkoutsByOwnerFiltered({
+          ownerKey,
+          workoutType: typeFilter ? typeFilterValue : undefined,
+          menuKeyword: menuFilter ? menuFilterValue : undefined,
+        }),
+      ]);
+      workouts = filtered;
+      availableTypes = types;
     } catch (e: unknown) {
       error = e instanceof Error ? e.message : String(e);
     }
   }
 
-  const availableTypes = toWorkoutTypes(workouts);
-  const filteredWorkouts = filterWorkouts(workouts, typeFilter, menuFilter);
-  const groups = groupByDay(filteredWorkouts);
+  const groups = groupByDay(workouts);
 
   return (
     <AppShell title="ワークアウト履歴">
@@ -119,7 +111,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
               <span className="cb-muted" style={{ fontSize: 12 }}>種類</span>
               <select
                 name="type"
-                defaultValue={typeFilterInput}
+                defaultValue={typeFilterValue}
                 style={{
                   minHeight: "var(--tap)",
                   borderRadius: "var(--radius)",
@@ -142,7 +134,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
               <span className="cb-muted" style={{ fontSize: 12 }}>メニュー</span>
               <input
                 name="menu"
-                defaultValue={menuFilterInput}
+                defaultValue={menuFilterValue}
                 placeholder="キーワードで絞り込み"
                 style={{
                   width: "100%",
@@ -195,7 +187,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
 
         {(typeFilter || menuFilter) && (
           <div className="cb-muted" style={{ fontSize: 12 }}>
-            表示中: 種類 {typeFilter ? `「${typeFilter}」` : "指定なし"} / メニュー {menuFilter ? `「${menuFilter}」` : "指定なし"}
+            表示中: 種類 {typeFilter ? `「${typeFilterValue || typeFilter}」` : "指定なし"} / メニュー {menuFilter ? `「${menuFilterValue || menuFilter}」` : "指定なし"}
           </div>
         )}
       </Card>
