@@ -101,7 +101,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams?: Sea
                 </div>
 
                 <div className="cb-muted" style={{ marginTop: 6, fontSize: 12 }}>
-                  {f.durationMin} min{f.intensity ? ` / ${f.intensity}` : ""}
+                  {f.durationMin} kg{f.intensity ? ` / ${f.intensity} 回` : ""}
                 </div>
 
                 {f.detail ? <div style={{ marginTop: 8 }}>{f.detail}</div> : null}
