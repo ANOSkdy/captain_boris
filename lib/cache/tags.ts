@@ -12,6 +12,14 @@ export function dayTag(ownerKey: string, dayKey: string): string {
   return `cb:day:${ownerKey}:${dayKey}`;
 }
 
+export function journalListTag(ownerKey: string): string {
+  return `cb:journal:list:${ownerKey}`;
+}
+
+export function journalEntryTag(ownerKey: string, id: string): string {
+  return `cb:journal:entry:${ownerKey}:${id}`;
+}
+
 export function tagsForMonth(ownerKey: string, month: string): string[] {
   return [ownerTag(ownerKey), monthTag(ownerKey, month)];
 }
