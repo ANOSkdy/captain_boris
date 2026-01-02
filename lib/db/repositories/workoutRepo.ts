@@ -131,7 +131,7 @@ export async function listWorkoutTypes(ownerKey: string): Promise<string[]> {
 
   return rows
     .map((r: { workout_type: string | null }) => r.workout_type)
-    .filter((v): v is string => Boolean(v));
+    .filter((v: string | null): v is string => Boolean(v));
 }
 
 export async function createWorkout(input: {
