@@ -1,6 +1,7 @@
 import "server-only";
 
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/Card";
@@ -21,6 +22,10 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
   const ownerKey = getOwnerKey();
   const id = (params?.id ?? "").trim();
 
+  if (!id) {
+    notFound();
+  }
+
   let entry = null;
   let error: string | null = null;
 
@@ -39,32 +44,6 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
       一覧へ
     </Link>
   );
-
-  if (!id) {
-    return (
-      <AppShell title="ジャーナル詳細" rightSlot={rightSlot}>
-        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)" }}>
-          <div style={{ fontWeight: 900 }}>読み込みエラー</div>
-          <div className="cb-muted" style={{ marginTop: 6 }}>ID が指定されていません。</div>
-          <div style={{ marginTop: 12 }}>
-            <Link
-              href="/journal"
-              style={{
-                display: "inline-block",
-                padding: "10px 14px",
-                borderRadius: "var(--radius)",
-                background: "var(--c-primary)",
-                color: "white",
-                fontWeight: 800,
-              }}
-            >
-              ジャーナル一覧へ戻る
-            </Link>
-          </div>
-        </Card>
-      </AppShell>
-    );
-  }
 
   return (
     <AppShell title="ジャーナル詳細" rightSlot={rightSlot}>
@@ -91,29 +70,7 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
         </Card>
       ) : null}
 
-      {missing ? (
-        <Card glass style={{ padding: 12, border: "1px solid rgba(190, 82, 242, 0.6)", display: "grid", gap: 10 }}>
-          <div style={{ fontWeight: 900 }}>見つかりませんでした</div>
-          <p className="cb-muted" style={{ marginTop: 0 }}>
-            ID「{id}」のジャーナルは存在しないか、削除された可能性があります。
-          </p>
-          <div>
-            <Link
-              href="/journal"
-              style={{
-                display: "inline-block",
-                padding: "10px 14px",
-                borderRadius: "var(--radius)",
-                background: "var(--c-primary)",
-                color: "white",
-                fontWeight: 800,
-              }}
-            >
-              一覧に戻る
-            </Link>
-          </div>
-        </Card>
-      ) : null}
+      {missing ? notFound() : null}
 
       <JournalForm
         mode="edit"
