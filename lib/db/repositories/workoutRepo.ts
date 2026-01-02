@@ -129,7 +129,9 @@ export async function listWorkoutTypes(ownerKey: string): Promise<string[]> {
     SELECT DISTINCT workout_type FROM workout_logs WHERE owner_key=${ownerKey} ORDER BY workout_type ASC;
   `;
 
-  return rows.map((r) => r.workout_type).filter((v): v is string => Boolean(v));
+  return rows
+    .map((r: { workout_type: string | null }) => r.workout_type)
+    .filter((v): v is string => Boolean(v));
 }
 
 export async function createWorkout(input: {
