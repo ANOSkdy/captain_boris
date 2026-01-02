@@ -143,6 +143,11 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
+          <span className="cb-muted" style={{ fontSize: 12 }}>メニュー（任意）</span>
+          <textarea {...register("detail")} rows={2} style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled={disabled || savePending} />
+        </label>
+
+        <label style={{ display: "grid", gap: 6 }}>
           <span className="cb-muted" style={{ fontSize: 12 }}>重さ（kg）</span>
           <input
             inputMode="numeric"
@@ -167,11 +172,6 @@ export function WorkoutForm({ dayKey, disabled }: Props) {
             style={inputStyle}
             disabled={disabled || savePending}
           />
-        </label>
-
-        <label style={{ display: "grid", gap: 6 }}>
-          <span className="cb-muted" style={{ fontSize: 12 }}>詳細（任意）</span>
-          <textarea {...register("detail")} rows={2} style={{ ...inputStyle, minHeight: 70, resize: "vertical" }} disabled={disabled || savePending} />
         </label>
 
         <button type="submit" style={btnPrimary} disabled={disabled || savePending}>
