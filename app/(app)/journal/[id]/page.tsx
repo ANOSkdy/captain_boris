@@ -8,9 +8,21 @@ import { Card } from "@/components/Card";
 import { JournalForm } from "@/components/forms/JournalForm";
 import { getCachedJournalEntry } from "@/lib/journal/cache";
 import { isDatabaseConfigured, databaseConfigHint } from "@/lib/db/isConfigured";
-import { getOwnerKey } from "@/lib/actions/common";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+type PageProps = {
+  params: { id?: string } | Promise<{ id?: string }>;
+};
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function logNotFound(reason: "missing_id" | "invalid_uuid" | "db_null", id: string, ownerKey: string) {
+  console.warn(
+    `[journal][detail][notFound] route=app/(app)/journal/[id]/page.tsx reason=${reason} id=${id} ownerKey=${ownerKey}`
+  );
+}
 
 function fmtDateTime(iso: string): string {
   const d = new Date(iso);
@@ -18,11 +30,18 @@ function fmtDateTime(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default async function JournalDetailPage({ params }: { params: { id: string } }) {
-  const ownerKey = getOwnerKey();
-  const id = (params?.id ?? "").trim();
+export default async function JournalDetailPage({ params }: PageProps) {
+  const { id: rawId } = await params;
+  const ownerKey = process.env.OWNER_KEY ?? "default";
+  const id = (rawId ?? "").trim();
 
   if (!id) {
+    logNotFound("missing_id", id, ownerKey);
+    notFound();
+  }
+
+  if (!uuidPattern.test(id)) {
+    logNotFound("invalid_uuid", id, ownerKey);
     notFound();
   }
 
@@ -38,6 +57,11 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
   }
 
   const missing = isDatabaseConfigured() && !error && !entry;
+
+  if (missing) {
+    logNotFound("db_null", id, ownerKey);
+    notFound();
+  }
 
   const rightSlot = (
     <Link href="/journal" style={{ fontWeight: 700 }}>
@@ -69,8 +93,6 @@ export default async function JournalDetailPage({ params }: { params: { id: stri
           </div>
         </Card>
       ) : null}
-
-      {missing ? notFound() : null}
 
       <JournalForm
         mode="edit"

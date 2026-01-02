@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { createJournalEntry, deleteJournalEntry, updateJournalEntry } from "@/lib/db/repositories/journalRepo";
-import { getOwnerKey } from "@/lib/actions/common";
+import { getOwnerKey } from "@/lib/server/ownerKey";
 import { fail, ok, type ActionResult, toErrorMessage } from "@/lib/actions/result";
 import { journalInputSchema } from "@/lib/domain/validators";
 import { invalidateJournalEntry, invalidateJournalList } from "@/lib/cache/revalidate";
