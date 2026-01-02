@@ -16,6 +16,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type WorkoutGroup = {
   dayKey: string;
@@ -112,7 +113,7 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
 
       <Card glass style={{ padding: 12, display: "grid", gap: 10 }}>
         <div style={{ fontWeight: 900 }}>フィルター</div>
-        <form method="get" style={{ display: "grid", gap: 10 }}>
+        <form method="get" action="/workoutlist" style={{ display: "grid", gap: 10 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
             <label style={{ display: "grid", gap: 6 }}>
               <span className="cb-muted" style={{ fontSize: 12 }}>種類</span>
