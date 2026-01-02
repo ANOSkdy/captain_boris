@@ -109,11 +109,14 @@ export async function listWorkoutsByOwnerFiltered(input: {
   await ensureSchema();
   const sql = getDb();
 
+  const typeFilter = input.workoutType?.trim() ?? "";
+  const menuFilter = input.menuKeyword?.trim() ?? "";
+
   const rows = await sql<WorkoutRow[]>`
     SELECT * FROM workout_logs
     WHERE owner_key=${input.ownerKey}
-      ${input.workoutType ? sql`AND LOWER(workout_type)=LOWER(${input.workoutType})` : sql``}
-      ${input.menuKeyword ? sql`AND detail ILIKE ${"%" + input.menuKeyword + "%"}` : sql``}
+      ${typeFilter ? sql`AND LOWER(TRIM(workout_type))=LOWER(${typeFilter})` : sql``}
+      ${menuFilter ? sql`AND detail ILIKE ${"%" + menuFilter + "%"}` : sql``}
     ORDER BY performed_at DESC;
   `;
 
