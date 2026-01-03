@@ -53,6 +53,40 @@ function normalizeFilterValue(v: string | undefined): string {
   return v?.trim().toLowerCase() ?? "";
 }
 
+function WorkoutRow({
+  record,
+  tz,
+  compact = false,
+}: {
+  record: DbRecord<WorkoutFields>;
+  tz: string;
+  compact?: boolean;
+}) {
+  const f = record.fields;
+
+  return (
+    <div className={`workout-list__row${compact ? " workout-list__row--compact" : ""}`}>
+      <div className="workout-list__cell" data-label="日時">
+        <span>{fmtDateTime(f.performedAt, tz)}</span>
+      </div>
+      <div className="workout-list__cell" data-label="種類">
+        <span style={{ fontWeight: 700 }}>{f.workoutType}</span>
+      </div>
+      <div className="workout-list__cell" data-label="メニュー">
+        <span className={compact ? "workout-list__truncate" : undefined} style={{ whiteSpace: compact ? "nowrap" : "pre-wrap" }}>
+          {f.detail ?? "—"}
+        </span>
+      </div>
+      <div className="workout-list__cell" data-label="重さ（kg）">
+        <span>{f.durationMin ?? "—"}</span>
+      </div>
+      <div className="workout-list__cell" data-label="回数">
+        <span>{f.intensity ?? "—"}</span>
+      </div>
+    </div>
+  );
+}
+
 export default async function WorkoutListPage({ searchParams }: { searchParams?: SearchParams }) {
   const tz = DISPLAY_TZ;
   const ownerKey = getOwnerKey();
@@ -210,30 +244,27 @@ export default async function WorkoutListPage({ searchParams }: { searchParams?:
             <div>重さ（kg）</div>
             <div>回数</div>
           </div>
-          <div className="workout-list__rows">
-            {group.items.map((record) => {
-              const f = record.fields;
-              return (
-                <div key={record.id} className="workout-list__row">
-                  <div className="workout-list__cell" data-label="日時">
-                    <span>{fmtDateTime(f.performedAt, tz)}</span>
-                  </div>
-                  <div className="workout-list__cell" data-label="種類">
-                    <span style={{ fontWeight: 700 }}>{f.workoutType}</span>
-                  </div>
-                  <div className="workout-list__cell" data-label="メニュー">
-                    <span style={{ whiteSpace: "pre-wrap" }}>{f.detail ?? "—"}</span>
-                  </div>
-                  <div className="workout-list__cell" data-label="重さ（kg）">
-                    <span>{f.durationMin ?? "—"}</span>
-                  </div>
-                  <div className="workout-list__cell" data-label="回数">
-                    <span>{f.intensity ?? "—"}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {group.items.length > 0 ? (
+            <div className="workout-list__rows">
+              <WorkoutRow record={group.items[0]} tz={tz} compact />
+            </div>
+          ) : null}
+
+          {group.items.length > 1 ? (
+            <details className="workout-list__more">
+              <summary className="workout-list__toggle">
+                他{group.items.length - 1}件を表示
+                <span aria-hidden="true" style={{ fontSize: 12, color: "var(--muted)" }}>
+                  ▼
+                </span>
+              </summary>
+              <div className="workout-list__rows">
+                {group.items.slice(1).map((record) => (
+                  <WorkoutRow key={record.id} record={record} tz={tz} />
+                ))}
+              </div>
+            </details>
+          ) : null}
         </Card>
       ))}
     </AppShell>

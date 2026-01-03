@@ -163,8 +163,52 @@ html {
   align-items: start;
 }
 
+.workout-list__row--compact {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--card-bg) 85%, transparent);
+}
+
 .workout-list__cell {
   font-size: 13px;
+}
+
+.workout-list__truncate {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workout-list__more {
+  display: grid;
+  gap: 8px;
+  border-top: 1px dashed var(--card-border);
+  padding-top: 8px;
+}
+
+.workout-list__toggle {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--fg);
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--card-bg) 75%, transparent);
+}
+
+.workout-list__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.workout-list__toggle:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
 }
 
 @media (max-width: 720px) {
@@ -192,6 +236,15 @@ html {
     content: attr(data-label);
     color: var(--muted);
     font-size: 11px;
+  }
+
+  .workout-list__row--compact {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-list__truncate {
+    max-width: 100%;
+    white-space: normal;
   }
 }
 
