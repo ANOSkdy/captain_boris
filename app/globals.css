@@ -146,7 +146,7 @@ html {
 
 .workout-list__header {
   display: grid;
-  grid-template-columns: 140px 90px minmax(90px, 1fr) minmax(160px, 2fr);
+  grid-template-columns: 140px 100px minmax(120px, 1fr) 110px 90px;
   gap: 8px;
   font-size: 12px;
 }
@@ -158,7 +158,7 @@ html {
 
 .workout-list__row {
   display: grid;
-  grid-template-columns: 140px 90px minmax(90px, 1fr) minmax(160px, 2fr);
+  grid-template-columns: 140px 100px minmax(120px, 1fr) 110px 90px;
   gap: 8px;
   align-items: start;
 }

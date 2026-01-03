@@ -101,6 +101,40 @@ export async function listWorkoutsByOwner(ownerKey: string): Promise<DbRecord<Wo
   return rows.map(mapWorkout);
 }
 
+export async function listWorkoutsByOwnerFiltered(input: {
+  ownerKey: string;
+  workoutType?: string;
+  menuKeyword?: string;
+}): Promise<DbRecord<WorkoutFields>[]> {
+  await ensureSchema();
+  const sql = getDb();
+
+  const typeFilter = input.workoutType?.trim() ?? "";
+  const menuFilter = input.menuKeyword?.trim() ?? "";
+
+  const rows = await sql<WorkoutRow[]>`
+    SELECT * FROM workout_logs
+    WHERE owner_key=${input.ownerKey}
+      ${typeFilter ? sql`AND LOWER(TRIM(workout_type))=LOWER(${typeFilter})` : sql``}
+      ${menuFilter ? sql`AND detail ILIKE ${"%" + menuFilter + "%"}` : sql``}
+    ORDER BY performed_at DESC;
+  `;
+
+  return rows.map(mapWorkout);
+}
+
+export async function listWorkoutTypes(ownerKey: string): Promise<string[]> {
+  await ensureSchema();
+  const sql = getDb();
+  const rows = await sql<{ workout_type: string | null }[]>`
+    SELECT DISTINCT workout_type FROM workout_logs WHERE owner_key=${ownerKey} ORDER BY workout_type ASC;
+  `;
+
+  return rows
+    .map((r: { workout_type: string | null }) => r.workout_type)
+    .filter((v: string | null): v is string => Boolean(v));
+}
+
 export async function createWorkout(input: {
   ownerKey: string;
   dayId: string;
